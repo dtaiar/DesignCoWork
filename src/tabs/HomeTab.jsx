@@ -1,18 +1,16 @@
 import { sampleCaptures, sampleOutputs } from '../data/captures'
+import { skills } from '../data/skills'
 
 export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab }) {
-  const quickActions = [
-    { id: 'critique', icon: '✦', name: 'Design Critique', desc: 'Structured feedback on any screen', bg: 'var(--accent-2)' },
-    { id: 'a11y',    icon: '◎', name: 'A11y Review',     desc: 'WCAG 2.1 AA audit',              bg: 'var(--green-2)' },
-    { id: 'handoff', icon: '⌥', name: 'Dev Handoff',     desc: 'Spec engineers can act on',      bg: 'var(--blue-2)' },
-  ]
+  const quickIds = ['critique', 'a11y', 'handoff']
+  const quickActions = quickIds.map(id => {
+    const s = skills.find(sk => sk.id === id)
+    return { id, icon: s.icon, name: s.name, desc: s.desc, bg: s.color }
+  })
 
   return (
     <>
       <div style={{ padding: '20px 20px 0' }}>
-        <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 2 }}>
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </div>
         <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 6 }}>
           Good morning,<br />Daniel.
         </div>
@@ -45,7 +43,7 @@ export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab }) {
               textAlign: 'left', fontFamily: 'inherit',
             }}
           >
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: q.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, marginBottom: 10 }}>{q.icon}</div>
+            <div style={{ width: 40, height: 40, borderRadius: 11, background: q.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 10 }}>{q.icon}</div>
             <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 2 }}>{q.name}</div>
             <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4 }}>{q.desc}</div>
           </button>
@@ -78,7 +76,7 @@ export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab }) {
       </div>
       <div className="item-list">
         {sampleOutputs.slice(0, 2).map(o => (
-          <div key={o.id} className="item-card" onClick={onOpenOutput}>
+          <div key={o.id} className="item-card" onClick={() => onOpenOutput(o.fullOutput)}>
             <div className="item-top">
               <span className="item-title">{o.title}</span>
               <span className="item-time">{o.age}</span>

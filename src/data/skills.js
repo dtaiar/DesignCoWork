@@ -14,7 +14,7 @@ export const skills = [
   },
   {
     id: 'synthesis',
-    icon: '◈',
+    icon: '🔬',
     name: 'Research Synthesis',
     desc: 'Themes and decisions from raw research',
     color: 'var(--teal-2)',
@@ -28,7 +28,7 @@ export const skills = [
   },
   {
     id: 'critique',
-    icon: '✦',
+    icon: '🔍',
     name: 'Design Critique',
     desc: 'Usability, hierarchy, and consistency feedback',
     color: 'var(--accent-2)',
@@ -42,7 +42,7 @@ export const skills = [
   },
   {
     id: 'uxcopy',
-    icon: '◇',
+    icon: '✍️',
     name: 'UX Copy',
     desc: 'Microcopy, error states, CTAs, empty states',
     color: 'var(--orange-2)',
@@ -56,7 +56,7 @@ export const skills = [
   },
   {
     id: 'system',
-    icon: '⬡',
+    icon: '🧩',
     name: 'Design System Audit',
     desc: 'Naming, tokens, and consistency check',
     color: 'var(--purple-2)',
@@ -69,7 +69,7 @@ export const skills = [
   },
   {
     id: 'a11y',
-    icon: '◎',
+    icon: '♿',
     name: 'Accessibility Review',
     desc: 'WCAG 2.1 AA audit with exportable checklist',
     color: 'var(--green-2)',
@@ -83,7 +83,7 @@ export const skills = [
   },
   {
     id: 'handoff',
-    icon: '⌥',
+    icon: '📐',
     name: 'Dev Handoff',
     desc: 'Layout, tokens, props, states, and animation',
     color: 'var(--blue-2)',

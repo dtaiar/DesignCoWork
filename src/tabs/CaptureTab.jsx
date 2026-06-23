@@ -108,7 +108,11 @@ export default function CaptureTab({ onOpenPost, showToast }) {
               <div className="cap-relevance-text">{c.relevance}</div>
             </div>
             <div className="cap-actions">
-              <button className="btn btn-secondary btn-sm" onClick={() => showToast('Copied to clipboard ✓')}>Copy brief</button>
+              <button className="btn btn-secondary btn-sm" onClick={() => {
+                const text = `${c.title}\n${c.source}\n\nThree things that matter:\n${c.points.map(p => `→ ${p}`).join('\n')}\n\nWhy it matters:\n${c.relevance}`
+                navigator.clipboard?.writeText(text)
+                showToast('Brief copied ✓')
+              }}>Copy brief</button>
               <button className="btn btn-secondary btn-sm" onClick={() => onOpenPost({ type: 'capture', capture: c })}>Write post</button>
             </div>
           </div>

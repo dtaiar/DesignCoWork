@@ -16,6 +16,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [activePanel, setActivePanel] = useState(null)
   const [activeSkill, setActiveSkill] = useState(null)
+  const [skillOutput, setSkillOutput] = useState(null)
   const [postContext, setPostContext] = useState(null)
   const [toast, setToast] = useState({ msg: '', show: false })
 
@@ -25,10 +26,10 @@ export default function App() {
   }, [])
 
   const openSkillPanel = (skill) => { setActiveSkill(skill); setActivePanel('skill') }
-  const openOutputPanel = () => setActivePanel('output')
+  const openOutputPanel = (output) => { if (output) setSkillOutput(output); setActivePanel('output') }
   const openPostPanel = (ctx) => { setPostContext(ctx); setActivePanel('post') }
   const closePanel = () => setActivePanel(null)
-  const runSkill = () => { closePanel(); setTimeout(openOutputPanel, 200) }
+  const runSkill = (output) => { closePanel(); setTimeout(() => openOutputPanel(output), 220) }
 
   const tabs = { home: HomeTab, tools: ToolsTab, capture: CaptureTab, posts: PostsTab, library: LibraryTab }
   const ActiveTab = tabs[activeTab]
@@ -48,7 +49,7 @@ export default function App() {
       <BottomNav active={activeTab} onSwitch={setActiveTab} />
       {activePanel && <div className="overlay" onClick={closePanel} />}
       <SkillPanel open={activePanel === 'skill'} skill={activeSkill} onClose={closePanel} onRun={runSkill} />
-      <OutputPanel open={activePanel === 'output'} onClose={closePanel} showToast={showToast} />
+      <OutputPanel open={activePanel === 'output'} output={skillOutput} onClose={closePanel} showToast={showToast} />
       <PostPanel open={activePanel === 'post'} context={postContext} onClose={closePanel} showToast={showToast} />
       <Toast msg={toast.msg} show={toast.show} />
     </div>

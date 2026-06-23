@@ -1,64 +1,133 @@
-const output = {
-  title: 'Hedging Tool — Filter Panel',
-  skill: 'Design Critique',
-  age: '3 days ago',
-  sections: [
-    {
-      label: 'What was reviewed',
-      body: "The filter panel in the Hedging Tool's position management screen — specifically the chip-based filter row, the reset affordance, and the loading/empty states after a filter is applied.",
-    },
-  ],
-  bullets: [
-    "Filter chips don't differentiate between available and applied state — the only visual change is a background fill that fails the 3:1 contrast check in light mode",
-    'The "Reset filters" button sits in the bottom-right corner, where most users scan for a confirm/apply action. It gets triggered accidentally when users try to confirm a filter set',
-    'No loading state after a filter is applied — the table either refreshes instantly (dev environment) or takes 1–3 seconds (production). No skeleton, no spinner, no indication that something is happening',
-  ],
-  callout: {
-    label: 'Recommended fix order',
-    text: 'Fix the loading state first — it costs nothing in design effort and removes the most visible production bug. Then the Reset placement. Token contrast is a design system issue, not a one-off fix.',
-  },
-  working: "The filter chip labels are specific and scannable. The panel's visual weight doesn't compete with the table data. Dismissal on outside click is correctly implemented.",
+// Renders the dynamic output object produced by generateOutput(skillId, input).
+// Section types: 'bullets' | 'body' | 'callout' | 'issues' | 'tokens' | 'copy-variants'
+
+function Section({ section }) {
+  if (section.type === 'bullets') {
+    return (
+      <div className="out-section">
+        <div className="out-section-label">{section.label}</div>
+        <ul className="out-bullets">
+          {section.items.map((item, i) => <li key={i}>{item}</li>)}
+        </ul>
+      </div>
+    )
+  }
+
+  if (section.type === 'body') {
+    return (
+      <div className="out-section">
+        <div className="out-section-label">{section.label}</div>
+        <div className="out-section-body">{section.text}</div>
+      </div>
+    )
+  }
+
+  if (section.type === 'callout') {
+    return (
+      <div className="out-callout">
+        <div className="out-callout-label">{section.label}</div>
+        <div className="out-callout-text">{section.text}</div>
+      </div>
+    )
+  }
+
+  if (section.type === 'issues') {
+    const levelColor = { high: 'var(--red, #E85C4A)', med: 'var(--orange)', low: 'var(--text-3)', fail: 'var(--red, #E85C4A)', pass: 'var(--green)' }
+    const levelLabel = { high: 'HIGH', med: 'MED', low: 'LOW', fail: '✗', pass: '✓', A: 'A', AA: 'AA' }
+    return (
+      <div className="out-section">
+        <div className="out-section-label">{section.label}</div>
+        <div className="out-issues">
+          {section.items.map((item, i) => (
+            <div key={i} className="out-issue-row">
+              <span
+                className="out-issue-badge"
+                style={{ color: levelColor[item.level] || levelColor[item.status] || 'var(--text-2)' }}
+              >
+                {levelLabel[item.level] || item.level}
+              </span>
+              <div className="out-issue-content">
+                <div className="out-issue-title">{item.criterion}</div>
+                <div className="out-issue-detail">{item.detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (section.type === 'tokens') {
+    return (
+      <div className="out-section">
+        <div className="out-section-label">{section.label}</div>
+        <div className="out-tokens">
+          {section.items.map((item, i) => (
+            <div key={i} className="out-token-row">
+              <div className="out-token-swatch" style={{ background: item.value }} />
+              <div className="out-token-info">
+                <span className="out-token-name">{item.token}</span>
+                <span className="out-token-value">{item.value}</span>
+              </div>
+              <div className="out-token-usage">{item.usage}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (section.type === 'copy-variants') {
+    return (
+      <div className="out-section">
+        <div className="out-section-label">{section.label}</div>
+        <div className="out-variants">
+          {section.items.map((item, i) => (
+            <div key={i} className="out-variant">
+              <div className="out-variant-label">{item.label}</div>
+              <div className="out-variant-text">"{item.text}"</div>
+              {item.note && <div className="out-variant-note">{item.note}</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return null
 }
 
-export default function OutputPanel({ open, onClose, showToast }) {
-  const copyText = [output.title, ...output.bullets, output.callout.text, output.working].join('\n\n')
-
+export default function OutputPanel({ open, output, onClose, showToast }) {
   return (
     <div className={`panel${open ? ' open' : ''}`}>
       <div className="panel-handle" />
-      <div className="panel-head">
-        <div className="panel-icon">✦</div>
-        <div className="panel-title">{output.title}</div>
-        <div className="panel-sub">{output.skill} · {output.age}</div>
-      </div>
-      <div className="panel-body">
-        {output.sections.map((s, i) => (
-          <div key={i} className="out-section">
-            <div className="out-section-label">{s.label}</div>
-            <div className="out-section-body">{s.body}</div>
+      {output ? (
+        <>
+          <div className="panel-head">
+            <div className="panel-icon" style={{ color: output.skillColor }}>{output.icon}</div>
+            <div className="panel-title">{output.title}</div>
+            <div className="panel-sub">{output.skill}</div>
           </div>
-        ))}
-        <div className="out-section">
-          <div className="out-section-label">Priority issues</div>
-          <ul className="out-bullets">
-            {output.bullets.map((b, i) => <li key={i}>{b}</li>)}
-          </ul>
+          <div className="panel-body">
+            {output.sections.map((section, i) => (
+              <Section key={i} section={section} />
+            ))}
+          </div>
+          <div className="panel-footer">
+            <button
+              className="btn btn-primary btn-full"
+              onClick={() => { navigator.clipboard?.writeText(output.copyText || ''); showToast('Copied ✓'); onClose() }}
+            >
+              Copy output
+            </button>
+            <button className="btn btn-secondary btn-full" onClick={onClose}>Close</button>
+          </div>
+        </>
+      ) : (
+        <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-3)', fontSize: 14 }}>
+          Run a skill to see output here.
         </div>
-        <div className="out-callout">
-          <div className="out-callout-label">{output.callout.label}</div>
-          <div className="out-callout-text">{output.callout.text}</div>
-        </div>
-        <div className="out-section" style={{ marginTop: 18 }}>
-          <div className="out-section-label">What&apos;s working</div>
-          <div className="out-section-body">{output.working}</div>
-        </div>
-      </div>
-      <div className="panel-footer">
-        <button className="btn btn-primary btn-full" onClick={() => { navigator.clipboard?.writeText(copyText); showToast('Copied ✓'); onClose() }}>
-          Copy output
-        </button>
-        <button className="btn btn-secondary btn-full" onClick={onClose}>Close</button>
-      </div>
+      )}
     </div>
   )
 }

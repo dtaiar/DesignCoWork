@@ -61,6 +61,34 @@ export const sampleOutputs = [
     preview: 'Three priority issues: filter chips don\'t communicate applied state, the "Reset" action is placed where users expect a confirm, and the panel lacks a loading state for slow queries.',
     age: '3 days ago',
     chipCls: 'chip-accent',
+    fullOutput: {
+      skill: 'Design Critique',
+      skillColor: 'var(--accent)',
+      icon: '🔍',
+      title: 'Hedging Tool — Filter Panel',
+      sections: [
+        {
+          label: 'Priority issues',
+          type: 'bullets',
+          items: [
+            'Filter chips don\'t differentiate between available and applied state — the only visual change is a background fill that fails the 3:1 contrast check in light mode',
+            'The "Reset filters" button sits in the bottom-right corner, where most users scan for a confirm/apply action — it gets triggered accidentally when users try to confirm a filter set',
+            'No loading state after a filter is applied — the table either refreshes instantly or takes 1–3 seconds in production with no skeleton, spinner, or indication something is happening',
+          ],
+        },
+        {
+          label: 'Recommended fix order',
+          type: 'callout',
+          text: 'Fix the loading state first — it costs nothing in design effort and removes the most visible production bug. Then the Reset placement. Token contrast is a design system issue, not a one-off fix.',
+        },
+        {
+          label: 'What\'s working',
+          type: 'body',
+          text: 'Filter chip labels are specific and scannable. The panel\'s visual weight doesn\'t compete with the table data. Dismissal on outside click is correctly implemented.',
+        },
+      ],
+      copyText: 'Design Critique — Hedging Tool Filter Panel\n\nPriority issues:\n→ Filter chips don\'t communicate applied state\n→ Reset button is in the wrong position\n→ No loading state after filter applied\n\nFix order: Loading state → Reset placement → Token contrast.',
+    },
   },
   {
     id: 2,
@@ -70,6 +98,37 @@ export const sampleOutputs = [
     preview: 'Focus order breaks on the second nav level. Tab stops skip two interactive elements. Contrast ratio on disabled states is 2.1:1 — below the 3:1 minimum for large text.',
     age: '5 days ago',
     chipCls: 'chip-green',
+    fullOutput: {
+      skill: 'Accessibility Review',
+      skillColor: 'var(--green)',
+      icon: '♿',
+      title: 'A11y — Customer Portal Navigation',
+      sections: [
+        {
+          label: 'WCAG 2.1 AA — failures',
+          type: 'issues',
+          items: [
+            { level: 'AA', criterion: '2.4.3 Focus Order', status: 'fail', detail: 'Focus order breaks on the second nav level — keyboard users are sent to the footer before reaching sub-items.' },
+            { level: 'A',  criterion: '2.1.1 Keyboard', status: 'fail', detail: 'Tab stops skip two interactive elements in the account dropdown.' },
+            { level: 'AA', criterion: '1.4.3 Contrast', status: 'fail', detail: 'Disabled nav items measure 2.1:1 — below the 3:1 minimum for large text.' },
+          ],
+        },
+        {
+          label: 'WCAG 2.1 AA — passing',
+          type: 'issues',
+          items: [
+            { level: 'AA', criterion: '1.4.1 Use of Color', status: 'pass', detail: 'Active state uses underline in addition to color.' },
+            { level: 'A',  criterion: '4.1.2 Name, Role, Value', status: 'pass', detail: 'Nav landmark and aria-current correctly applied.' },
+          ],
+        },
+        {
+          label: 'Recommended fix order',
+          type: 'callout',
+          text: 'Fix focus order first — it makes the nav unusable for keyboard users regardless of other issues. The tab stop gaps are a quick fix (tabIndex on the missing elements). Contrast is a token update.',
+        },
+      ],
+      copyText: 'Accessibility Review — Customer Portal Navigation\n\nFailures:\n✗ 2.4.3 Focus Order — breaks at second nav level\n✗ 2.1.1 Keyboard — two elements missing tab stops\n✗ 1.4.3 Contrast — disabled items at 2.1:1\n\nFix order: Focus order → Tab stops → Contrast.',
+    },
   },
   {
     id: 3,
@@ -79,6 +138,41 @@ export const sampleOutputs = [
     preview: 'Layout: 320px min-width, full-width on mobile. Tokens: uses surface-2 for calendar background, action-primary for selected range. Three interaction states: idle, selecting, confirmed.',
     age: '1 week ago',
     chipCls: 'chip-blue',
+    fullOutput: {
+      skill: 'Dev Handoff',
+      skillColor: 'var(--blue)',
+      icon: '📐',
+      title: 'Handoff — Date Range Picker',
+      sections: [
+        {
+          label: 'Layout',
+          type: 'body',
+          text: 'Min-width: 320px. Full-width on mobile (<768px), max-width 360px on desktop. Calendar grid: 7 columns, fixed cell size 40px × 40px. Header: month/year navigation with 44px tap targets. Padding: 16px all sides.',
+        },
+        {
+          label: 'Design tokens',
+          type: 'tokens',
+          items: [
+            { token: 'surface-2',      value: '#EFEDE9', usage: 'Calendar background' },
+            { token: 'action-primary', value: '#5B4BF4', usage: 'Selected date fill, range endpoints' },
+            { token: 'accent-2',       value: '#EEEEFF', usage: 'In-range cells background' },
+            { token: 'text-3',         value: '#A8A7A3', usage: 'Out-of-month dates, disabled days' },
+            { token: 'border',         value: '#E3E1DC', usage: 'Cell borders, header divider' },
+          ],
+        },
+        {
+          label: 'Interaction states',
+          type: 'bullets',
+          items: [
+            'Idle: surface-2 background, no selection highlighted',
+            'Selecting (first date picked): start date filled with action-primary, cursor changes to crosshair on hover',
+            'Range hover: cells between start and hovered date show accent-2 fill',
+            'Confirmed: both endpoints at action-primary, range cells at accent-2, confirm button enabled',
+          ],
+        },
+      ],
+      copyText: 'Dev Handoff — Date Range Picker\n\nLayout: 320px min, full-width mobile, 40×40px cells.\nTokens: surface-2 (calendar bg), action-primary (selection), accent-2 (range), text-3 (disabled).\nStates: Idle → Selecting → Range hover → Confirmed.',
+    },
   },
   {
     id: 4,
@@ -88,6 +182,34 @@ export const sampleOutputs = [
     preview: 'Rewrote 12 error messages. Main change: removed "Sorry, an error occurred" openers and replaced with what the user should do next. Validation errors now name the specific field and reason.',
     age: '2 weeks ago',
     chipCls: 'chip-orange',
+    fullOutput: {
+      skill: 'UX Copy',
+      skillColor: 'var(--orange)',
+      icon: '✍️',
+      title: 'UX Copy — Error Messages',
+      sections: [
+        {
+          label: 'Copy variants — validation errors',
+          type: 'copy-variants',
+          items: [
+            { label: 'Date out of range', text: 'Check the date — it needs to be today or later.', note: 'Names the field and the fix. No apology.' },
+            { label: 'Counterparty missing', text: 'Select a counterparty before submitting.', note: 'Direct. One action.' },
+            { label: 'Notional too low', text: 'Notional must be at least €10,000.', note: 'States the rule, not the error. Avoids "invalid".' },
+          ],
+        },
+        {
+          label: 'Voice check',
+          type: 'callout',
+          text: 'All 12 rewrites remove: "Sorry", "Unfortunately", "An error occurred". Each names the specific field and either the fix or the rule. None start with "Please".',
+        },
+        {
+          label: 'Pattern',
+          type: 'body',
+          text: 'Validation error formula: [Field] + [what\'s wrong or what\'s needed]. Skip the apology. Skip "invalid". Tell the user what to do, not that they failed.',
+        },
+      ],
+      copyText: 'UX Copy — Error Messages (Hedging Tool)\n\nDate out of range: "Check the date — it needs to be today or later."\nCounterparty missing: "Select a counterparty before submitting."\nNotional too low: "Notional must be at least €10,000."\n\nPattern: [Field] + [fix or rule]. No apologies, no "invalid".',
+    },
   },
 ];
 

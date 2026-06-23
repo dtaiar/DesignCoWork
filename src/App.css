@@ -1,5 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body, #root { height: 100%; overflow: hidden; }
+html, body { height: 100%; overflow: hidden; }
+#root { height: 100%; overflow: hidden; width: 100%; }
 
 .app {
   display: flex; flex-direction: column; height: 100dvh;
@@ -55,7 +56,27 @@ html, body, #root { height: 100%; overflow: hidden; }
 .panel-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
 .panel-footer { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
 .section-header { padding: 20px 20px 8px; display: flex; align-items: center; justify-content: space-between; }
+.section-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-1); }
 .section-link { font-size: 13px; color: var(--accent); font-weight: 600; cursor: pointer; border: none; background: none; -webkit-tap-highlight-color: transparent; font-family: inherit; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; font-family: inherit; font-weight: 600; cursor: pointer; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent; white-space: nowrap; }
+.btn:active { opacity: 0.75; }
+.btn-primary { background: var(--accent); color: #fff; font-size: 15px; padding: 13px 20px; }
+.btn-secondary { background: var(--surface-2); color: var(--text-1); font-size: 14px; padding: 11px 16px; border: 1.5px solid var(--border); }
+.btn-full { width: 100%; }
+.btn-sm { font-size: 12px; font-weight: 700; padding: 7px 13px; border-radius: 8px; }
+
+/* Chips / tags */
+.chip { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.chip-accent  { background: var(--accent-2);  color: var(--accent-3); }
+.chip-green   { background: var(--green-2);   color: var(--green); }
+.chip-blue    { background: var(--blue-2);    color: var(--blue); }
+.chip-orange  { background: var(--orange-2);  color: var(--orange); }
+.chip-purple  { background: var(--purple-2);  color: var(--purple); }
+.chip-teal    { background: var(--teal-2);    color: var(--teal); }
+.chip-amber   { background: var(--amber-2);   color: var(--amber); }
+.chip-neutral { background: var(--surface-2); color: var(--text-2); }
 .item-list { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; }
 .item-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
@@ -90,6 +111,40 @@ html, body, #root { height: 100%; overflow: hidden; }
 .out-callout { background: var(--accent-2); border-radius: 12px; padding: 14px; }
 .out-callout-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 6px; }
 .out-callout-text { font-size: 13px; line-height: 1.6; color: var(--accent-3); }
+/* Issues list (a11y, audits) */
+.out-issues { display: flex; flex-direction: column; gap: 10px; }
+.out-issue-row { display: flex; gap: 10px; align-items: flex-start; }
+.out-issue-badge { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; flex-shrink: 0; padding-top: 2px; min-width: 28px; }
+.out-issue-content { flex: 1; }
+.out-issue-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.out-issue-detail { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+/* Token list (dev handoff) */
+.out-tokens { display: flex; flex-direction: column; gap: 8px; }
+.out-token-row { display: flex; align-items: center; gap: 10px; }
+.out-token-swatch { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
+.out-token-info { display: flex; flex-direction: column; flex-shrink: 0; min-width: 120px; }
+.out-token-name { font-size: 12px; font-weight: 700; font-family: 'SF Mono', monospace; }
+.out-token-value { font-size: 11px; color: var(--text-3); font-family: 'SF Mono', monospace; }
+.out-token-usage { font-size: 12px; color: var(--text-2); }
+
+/* Copy variants (UX Copy) */
+.out-variants { display: flex; flex-direction: column; gap: 12px; }
+.out-variant { background: var(--surface-2); border-radius: 12px; padding: 12px; }
+.out-variant-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); margin-bottom: 5px; }
+.out-variant-text { font-size: 14px; font-weight: 600; line-height: 1.5; }
+.out-variant-note { font-size: 12px; color: var(--text-2); margin-top: 5px; line-height: 1.4; }
+
+/* Form fields in SkillPanel */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.form-hint { font-weight: 400; color: var(--text-3); }
+.input { width: 100%; background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; color: var(--text-1); font-family: inherit; resize: none; outline: none; transition: border-color 0.15s; }
+.input:focus { border-color: var(--accent); }
+.chips-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.sel-chip { padding: 6px 12px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--surface-2); font-size: 13px; font-weight: 500; color: var(--text-2); cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; font-family: inherit; }
+.sel-chip.on { background: var(--accent-2); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
 .enrich-loading { padding: 20px 16px; display: flex; align-items: center; gap: 10px; }
 .enrich-loading-text { font-size: 14px; font-weight: 500; color: var(--accent); }
 ::-webkit-scrollbar { display: none; }
