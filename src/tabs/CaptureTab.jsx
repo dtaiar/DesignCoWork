@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import { sampleCaptures } from '../data/captures'
 
-export default function CaptureTab({ onOpenPost, showToast }) {
-  const [type, setType] = useState('url')
+export default function CaptureTab({ onOpenPost, onOpenCapture, showToast, captures = [], addCapture }) {
+  const [inputType, setInputType] = useState('url')
   const [input, setInput] = useState('')
-  const [captures, setCaptures] = useState(sampleCaptures)
-  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | fetching | enriching | error
 
   const placeholders = {
     url: 'Paste a URL, LinkedIn post, or article link…',
@@ -13,49 +11,67 @@ export default function CaptureTab({ onOpenPost, showToast }) {
     note: 'Write a quick note or observation…',
   }
 
-  const runCapture = () => {
-    if (!input.trim()) { showToast('Paste a URL or text first'); return }
-    setLoading(true)
-    setInput('')
-    setTimeout(() => {
-      setCaptures(prev => [{
-        id: Date.now(),
-        type: 'Article',
-        typeColor: 'var(--accent)',
-        title: 'The Invisible Interface — Designing for Zero UI',
-        source: 'UX Collective · Jun 22, 2026',
-        points: [
-          "Zero UI isn't about removing interfaces — it's about moving interaction to where the data already lives",
-          'The cases that work share one trait: the system anticipates the next action with enough confidence to surface it without being asked',
-          'Failure mode is over-automation — when the system guesses wrong, the user has no visible model to correct it against',
-        ],
-        relevance: "The Hedging Tool's position entry flow has 6 manual steps that could be reduced to 2 if the system inferred counterparty and currency from the contract type. This article gives you the framing to make that argument to the PM.",
-        chip: { label: 'Article', cls: 'chip-accent' },
-        chip2: { label: 'UX Collective', cls: 'chip-neutral' },
-        previewText: '',
-        daysAgo: 'now',
-      }, ...prev])
-      setLoading(false)
-      showToast('Reference saved ✓')
-    }, 1800)
+  const statusLabel = {
+    fetching: 'Fetching page…',
+    enriching: 'Analyzing with AI…',
   }
+
+  const runCapture = async () => {
+    const val = input.trim()
+    if (!val) { showToast('Paste a URL or text first'); return }
+
+    setInput('')
+    setStatus('fetching')
+
+    try {
+      const res = await fetch('/api/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: inputType === 'url' ? val : '',
+          text: inputType !== 'url' ? val : '',
+          inputType,
+        }),
+      })
+
+      setStatus('enriching')
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `HTTP ${res.status}`)
+      }
+
+      const capture = await res.json()
+      addCapture?.(capture)
+      showToast('Reference saved ✓')
+    } catch (e) {
+      showToast(`Could not enrich: ${e.message}`)
+    } finally {
+      setStatus('idle')
+    }
+  }
+
+  const loading = status !== 'idle'
 
   return (
     <>
+      {/* Input area */}
       <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '16px 20px' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-2)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
           Add a design reference
         </div>
+
+        {/* Type selector */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
           {['url', 'text', 'note'].map(t => (
             <button
               key={t}
-              onClick={() => setType(t)}
+              onClick={() => setInputType(t)}
               style={{
                 padding: '5px 12px', borderRadius: 100,
-                border: `1.5px solid ${type === t ? 'var(--accent)' : 'var(--border)'}`,
-                background: type === t ? 'var(--accent-2)' : 'var(--surface)',
-                color: type === t ? 'var(--accent)' : 'var(--text-2)',
+                border: `1.5px solid ${inputType === t ? 'var(--accent)' : 'var(--border)'}`,
+                background: inputType === t ? 'var(--accent-2)' : 'var(--surface)',
+                color: inputType === t ? 'var(--accent)' : 'var(--text-2)',
                 fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent', fontFamily: 'inherit',
                 textTransform: 'capitalize',
@@ -63,35 +79,53 @@ export default function CaptureTab({ onOpenPost, showToast }) {
             >{t}</button>
           ))}
         </div>
+
+        {/* Input + Analyze */}
         <div style={{ display: 'flex', gap: 8 }}>
           <input
             className="input"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder={placeholders[type]}
-            onKeyDown={e => e.key === 'Enter' && runCapture()}
+            placeholder={placeholders[inputType]}
+            onKeyDown={e => e.key === 'Enter' && !loading && runCapture()}
+            disabled={loading}
             style={{ flex: 1 }}
           />
-          <button className="btn btn-primary btn-sm" onClick={runCapture}>Analyze</button>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={runCapture}
+            disabled={loading}
+          >
+            {loading ? '…' : 'Analyze'}
+          </button>
         </div>
       </div>
 
+      {/* List header */}
       <div className="section-header">
         <span className="section-title">Saved references</span>
         <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{captures.length} captures</span>
       </div>
 
+      {/* Capture cards */}
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {/* Loading skeleton */}
         {loading && (
           <div className="cap-card">
             <div className="enrich-loading">
               <div className="pulse" />
-              <span className="enrich-loading-text">Fetching and enriching…</span>
+              <span className="enrich-loading-text">{statusLabel[status] || 'Working…'}</span>
             </div>
           </div>
         )}
+
         {captures.map(c => (
-          <div key={c.id} className="cap-card">
+          <div
+            key={c.id}
+            className="cap-card"
+            onClick={() => onOpenCapture?.(c)}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="cap-header">
               <div className="cap-type" style={{ color: c.typeColor }}>{c.type}</div>
               <div className="cap-title">{c.title}</div>
@@ -100,24 +134,36 @@ export default function CaptureTab({ onOpenPost, showToast }) {
             <div className="cap-brief">
               <div className="cap-brief-title">Three things that matter</div>
               <ul className="cap-points">
-                {c.points.map((p, i) => <li key={i}>{p}</li>)}
+                {(c.points || []).map((p, i) => <li key={i}>{p}</li>)}
               </ul>
             </div>
             <div className="cap-relevance">
               <div className="cap-relevance-label">Why it matters for your work</div>
               <div className="cap-relevance-text">{c.relevance}</div>
             </div>
-            <div className="cap-actions">
-              <button className="btn btn-secondary btn-sm" onClick={() => {
-                const text = `${c.title}\n${c.source}\n\nThree things that matter:\n${c.points.map(p => `→ ${p}`).join('\n')}\n\nWhy it matters:\n${c.relevance}`
-                navigator.clipboard?.writeText(text)
-                showToast('Brief copied ✓')
-              }}>Copy brief</button>
-              <button className="btn btn-secondary btn-sm" onClick={() => onOpenPost({ type: 'capture', capture: c })}>Write post</button>
+            <div className="cap-actions" onClick={e => e.stopPropagation()}>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => {
+                  const text = [
+                    c.title, c.source, '',
+                    'Three things that matter',
+                    ...(c.points || []).map(p => `→ ${p}`),
+                    '', 'Why it matters:', c.relevance,
+                  ].join('\n')
+                  navigator.clipboard?.writeText(text)
+                  showToast('Brief copied ✓')
+                }}
+              >Copy brief</button>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => onOpenPost({ type: 'capture', capture: c })}
+              >Write post</button>
             </div>
           </div>
         ))}
       </div>
+
       <div className="spacer" />
     </>
   )

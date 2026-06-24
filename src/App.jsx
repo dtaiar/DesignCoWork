@@ -10,6 +10,8 @@ import LibraryTab from './tabs/LibraryTab'
 import SkillPanel from './panels/SkillPanel'
 import OutputPanel from './panels/OutputPanel'
 import PostPanel from './panels/PostPanel'
+import CaptureDetailPanel from './panels/CaptureDetailPanel'
+import { useCaptures } from './hooks/useCaptures'
 import './App.css'
 
 export default function App() {
@@ -18,7 +20,9 @@ export default function App() {
   const [activeSkill, setActiveSkill] = useState(null)
   const [skillOutput, setSkillOutput] = useState(null)
   const [postContext, setPostContext] = useState(null)
+  const [captureDetail, setCaptureDetail] = useState(null)
   const [toast, setToast] = useState({ msg: '', show: false })
+  const { captures, addCapture } = useCaptures()
 
   const showToast = useCallback((msg) => {
     setToast({ msg, show: true })
@@ -28,6 +32,7 @@ export default function App() {
   const openSkillPanel = (skill) => { setActiveSkill(skill); setActivePanel('skill') }
   const openOutputPanel = (output) => { if (output) setSkillOutput(output); setActivePanel('output') }
   const openPostPanel = (ctx) => { setPostContext(ctx); setActivePanel('post') }
+  const openCapturePanel = (capture) => { setCaptureDetail(capture); setActivePanel('capture') }
   const closePanel = () => setActivePanel(null)
   const runSkill = (output) => { closePanel(); setTimeout(() => openOutputPanel(output), 220) }
 
@@ -42,8 +47,11 @@ export default function App() {
           onOpenSkill={openSkillPanel}
           onOpenOutput={openOutputPanel}
           onOpenPost={openPostPanel}
+          onOpenCapture={openCapturePanel}
           onSwitchTab={setActiveTab}
           showToast={showToast}
+          captures={captures}
+          addCapture={addCapture}
         />
       </main>
       <BottomNav active={activeTab} onSwitch={setActiveTab} />
@@ -51,6 +59,7 @@ export default function App() {
       <SkillPanel open={activePanel === 'skill'} skill={activeSkill} onClose={closePanel} onRun={runSkill} />
       <OutputPanel open={activePanel === 'output'} output={skillOutput} onClose={closePanel} showToast={showToast} />
       <PostPanel open={activePanel === 'post'} context={postContext} onClose={closePanel} showToast={showToast} />
+      <CaptureDetailPanel open={activePanel === 'capture'} capture={captureDetail} onClose={closePanel} onOpenPost={openPostPanel} showToast={showToast} />
       <Toast msg={toast.msg} show={toast.show} />
     </div>
   )

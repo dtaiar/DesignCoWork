@@ -1,7 +1,7 @@
-import { sampleCaptures, sampleOutputs } from '../data/captures'
+import { sampleOutputs } from '../data/captures'
 import { skills } from '../data/skills'
 
-export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab }) {
+export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab, captures = [] }) {
   const quickIds = ['critique', 'a11y', 'handoff']
   const quickActions = quickIds.map(id => {
     const s = skills.find(sk => sk.id === id)
