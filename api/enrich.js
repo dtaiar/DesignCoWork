@@ -14,9 +14,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const { url, text, inputType } = req.body || {}
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = process.env.GEMINI_API_KEY
 
-  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' })
+  if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' })
 
   let content = ''
   const sourceUrl = url || ''
@@ -81,8 +81,8 @@ export default async function handler(req, res) {
 
   if (!content) return res.status(400).json({ error: 'No content to analyze' })
 
-  // ── Call Claude Haiku ────────────────────────────────────────────────────
-  const system = `You are a design intelligence engine for Daniel Taiar, a senior product designer at AXPO (an energy company). He works on:
+  // ── Call Gemini Flash (free tier) ───────────────────────────────────────
+  const systemInstruction = `You are a design intelligence engine for Daniel Taiar, a senior product designer at AXPO (an energy company). He works on:
 - Hedging Tool: a B2B web app for energy traders (position entry, portfolio view, counterparty management, complex filter panels, dense data tables)
 - Customer Portal: an energy customer-facing web app (account management, consumption data, contract details, responsive)
 - Cross-product design standards, branding, responsive design
@@ -121,28 +121,26 @@ Required JSON shape:
 
   let enriched
   try {
-    const anthropic = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 900,
-        system,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-      signal: AbortSignal.timeout(30000),
-    })
+    const gemini = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 900, temperature: 0.3 },
+        }),
+        signal: AbortSignal.timeout(30000),
+      }
+    )
 
-    const data = await anthropic.json()
-    if (!anthropic.ok) {
-      return res.status(502).json({ error: data.error?.message || 'Anthropic API error' })
+    const data = await gemini.json()
+    if (!gemini.ok) {
+      return res.status(502).json({ error: data.error?.message || 'Gemini API error' })
     }
 
-    const raw = data.content[0].text
+    const raw = (data.candidates?.[0]?.content?.parts?.[0]?.text || '')
       .replace(/^```json\n?/, '')
       .replace(/\n?```$/, '')
       .trim()
