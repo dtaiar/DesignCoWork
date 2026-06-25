@@ -1,7 +1,7 @@
 import { sampleOutputs } from '../data/captures'
 import { skills } from '../data/skills'
 
-export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab, captures = [] }) {
+export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab, captures = [], onOpenCapture }) {
   const quickIds = ['critique', 'a11y', 'handoff']
   const quickActions = quickIds.map(id => {
     const s = skills.find(sk => sk.id === id)
@@ -55,19 +55,24 @@ export default function HomeTab({ onOpenSkill, onOpenOutput, onSwitchTab, captur
         <button className="section-link" onClick={() => onSwitchTab('capture')}>See all</button>
       </div>
       <div className="item-list">
-        {sampleCaptures.slice(0, 2).map(c => (
-          <div key={c.id} className="item-card" onClick={() => onSwitchTab('capture')}>
+        {captures.slice(0, 2).map(c => (
+          <div key={c.id} className="item-card" onClick={() => onOpenCapture ? onOpenCapture(c) : onSwitchTab('capture')}>
             <div className="item-top">
               <span className="item-title">{c.title}</span>
               <span className="item-time">{c.daysAgo}</span>
             </div>
-            <div className="item-preview">{c.previewText}</div>
+            <div className="item-preview">{c.previewText || (c.points || [])[0] || ''}</div>
             <div className="item-footer">
-              <span className={`chip ${c.chip.cls}`}>{c.chip.label}</span>
-              <span className={`chip ${c.chip2.cls}`}>{c.chip2.label}</span>
+              {c.chip && <span className="chip chip-accent">{c.chip}</span>}
+              {c.chip2 && <span className="chip chip-neutral">{c.chip2}</span>}
             </div>
           </div>
         ))}
+        {captures.length === 0 && (
+          <div style={{ padding: '16px 20px', color: 'var(--text-3)', fontSize: 13 }}>
+            No captures yet — paste a URL in the Capture tab.
+          </div>
+        )}
       </div>
 
       <div className="section-header">
