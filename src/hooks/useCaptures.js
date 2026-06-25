@@ -25,8 +25,8 @@ function fromDb(row) {
     source: row.source || '',
     points: Array.isArray(row.points) ? row.points : [],
     relevance: row.relevance || '',
-    chip: row.chip || { label: row.type, cls: 'chip-accent' },
-    chip2: row.chip2 || { label: 'Reference', cls: 'chip-neutral' },
+    chip: typeof row.chip === 'object' ? row.chip?.label : (row.chip || row.type || ''),
+    chip2: typeof row.chip2 === 'object' ? row.chip2?.label : (row.chip2 || ''),
     previewText: row.preview_text || '',
     daysAgo: formatAge(row.created_at),
   }
