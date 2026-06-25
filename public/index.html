@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Design Companion</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F6F5F2;
+  --surface: #FFFFFF;
+  --surface-2: #EFEDE9;
+  --border: #E3E1DC;
+  --text-1: #18171A;
+  --text-2: #6B6A67;
+  --text-3: #A8A7A3;
+  --accent: #5B4BF4;
+  --accent-2: #EEEEFF;
+  --accent-3: #3D2FE3;
+  --green: #15803D;  --green-2: #DCFCE7;
+  --blue: #1D4ED8;   --blue-2: #DBEAFE;
+  --orange: #C2410C; --orange-2: #FFEDD5;
+  --purple: #7C3AED; --purple-2: #F5F3FF;
+  --teal: #0F766E;   --teal-2: #CCFBF1;
+  --amber: #B45309;  --amber-2: #FEF3C7;
+  --nav-h: 68px;
+}
+
+html, body { height: 100%; overflow: hidden; background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--text-1); -webkit-font-smoothing: antialiased; font-size: 15px; }
+
+#app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; overflow: hidden; }
+
+/* ── Header ── */
+.app-header {
+  background: rgba(255,255,255,0.9); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px; height: 52px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; position: relative; z-index: 10;
+}
+.header-left { display: flex; flex-direction: column; }
+.header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.03em; }
+.header-sub { font-size: 11px; color: var(--text-2); }
+.header-btn {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2);
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-1); -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Tabs ── */
+.tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: 16px; }
+.tab-content.active { display: block; }
+
+/* ── Bottom Nav ── */
+#bottom-nav {
+  width: 100%;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+  padding: 8px 0 env(safe-area-inset-bottom, 0px);
+  flex-shrink: 0; z-index: 100; min-height: var(--nav-h);
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 4px 0; cursor: pointer; border: none; background: none;
+  color: var(--text-3); font-size: 10px; font-weight: 500; letter-spacing: 0.01em;
+  transition: color 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.nav-item.active { color: var(--accent); }
+.nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+
+/* ── Shared components ── */
+.section-header { padding: 20px 20px 8px; display: flex; align-items: center; justify-content: space-between; }
+.section-title { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; }
+.section-link { font-size: 13px; color: var(--accent); font-weight: 600; cursor: pointer; border: none; background: none; -webkit-tap-highlight-color: transparent; }
+
+.chip {
+  display: inline-flex; align-items: center; padding: 3px 9px;
+  border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.01em;
+}
+.chip-accent  { background: var(--accent-2);  color: var(--accent-3); }
+.chip-green   { background: var(--green-2);   color: var(--green); }
+.chip-blue    { background: var(--blue-2);    color: var(--blue); }
+.chip-orange  { background: var(--orange-2);  color: var(--orange); }
+.chip-purple  { background: var(--purple-2);  color: var(--purple); }
+.chip-teal    { background: var(--teal-2);    color: var(--teal); }
+.chip-amber   { background: var(--amber-2);   color: var(--amber); }
+.chip-neutral { background: var(--surface-2); color: var(--text-2); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none; font-family: inherit; letter-spacing: -0.01em;
+  transition: opacity 0.1s, transform 0.1s; -webkit-tap-highlight-color: transparent;
+}
+.btn:active { opacity: 0.8; transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: white; }
+.btn-secondary { background: var(--surface-2); color: var(--text-1); }
+.btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
+.btn-full { width: 100%; }
+
+.input {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 15px; background: var(--surface);
+  color: var(--text-1); font-family: inherit; outline: none;
+  -webkit-appearance: none; transition: border-color 0.15s;
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--text-3); }
+textarea.input { resize: none; line-height: 1.6; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 13px; font-weight: 600; }
+.form-hint { font-size: 12px; color: var(--text-2); }
+.chips-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.sel-chip {
+  padding: 6px 14px; border-radius: 100px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 13px; font-weight: 500; cursor: pointer;
+  color: var(--text-1); transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+}
+.sel-chip.on { border-color: var(--accent); background: var(--accent-2); color: var(--accent); }
+
+/* ── HOME ── */
+.home-top { padding: 20px 20px 0; }
+.home-date { font-size: 12px; color: var(--text-2); margin-bottom: 2px; }
+.home-greeting { font-size: 24px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 6px; }
+.context-pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+  font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-2);
+  -webkit-tap-highlight-color: transparent; margin-top: 8px;
+}
+.context-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+.quick-scroll { padding: 16px 20px 4px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.quick-scroll::-webkit-scrollbar { display: none; }
+
+.quick-card {
+  flex-shrink: 0; width: 130px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.quick-card:active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-2); }
+.quick-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; }
+.quick-name { font-size: 13px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2px; }
+.quick-desc { font-size: 11px; color: var(--text-2); line-height: 1.4; }
+
+.item-list { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; }
+.item-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s;
+}
+.item-card:active { border-color: var(--accent); }
+.item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+.item-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+.item-time { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+.item-preview { font-size: 13px; color: var(--text-2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item-footer { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+
+/* ── TOOLS ── */
+.tools-pad { padding: 0 20px 8px; }
+.tools-group-label { padding: 18px 0 10px; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; }
+.skill-list { display: flex; flex-direction: column; gap: 8px; }
+.skill-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; transition: border-color 0.15s;
+}
+.skill-card:active { border-color: var(--accent); }
+.skill-icon { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.skill-info { flex: 1; min-width: 0; }
+.skill-name { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2px; }
+.skill-desc { font-size: 12px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.skill-arrow { color: var(--text-3); }
+
+/* ── CAPTURE ── */
+.capture-top { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; }
+.capture-label { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.type-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.type-btn {
+  padding: 5px 12px; border-radius: 100px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--text-2); transition: all 0.15s; -webkit-tap-highlight-color: transparent; font-family: inherit;
+}
+.type-btn.on { border-color: var(--accent); background: var(--accent-2); color: var(--accent); }
+.capture-row { display: flex; gap: 8px; align-items: flex-start; }
+.capture-row .input { flex: 1; }
+
+.capture-feed { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; }
+
+.cap-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.cap-header { padding: 14px 16px 10px; }
+.cap-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.cap-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; line-height: 1.3; }
+.cap-source { font-size: 12px; color: var(--text-2); }
+.cap-brief { padding: 0 16px 12px; }
+.cap-brief-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-2); margin-bottom: 6px; }
+.cap-points { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.cap-points li { font-size: 13px; line-height: 1.5; padding-left: 16px; position: relative; }
+.cap-points li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-size: 12px; top: 1px; }
+.cap-relevance { margin: 0 16px 14px; padding: 10px 12px; background: var(--accent-2); border-radius: 10px; }
+.cap-relevance-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 4px; }
+.cap-relevance-text { font-size: 12px; color: var(--accent-3); line-height: 1.5; }
+.cap-actions { display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border); }
+
+/* enrichment loading */
+.enrich-loading { padding: 20px 16px; display: flex; align-items: center; gap: 10px; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulseAnim 1.2s ease-in-out infinite; }
+@keyframes pulseAnim { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+.enrich-loading-text { font-size: 14px; font-weight: 500; color: var(--accent); }
+
+/* ── POSTS ── */
+.posts-modes { padding: 16px 20px 12px; display: flex; gap: 8px; }
+.mode-btn {
+  flex: 1; padding: 10px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: center; color: var(--text-2); transition: all 0.15s; font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.mode-btn.on { border-color: var(--accent); background: var(--accent-2); color: var(--accent); }
+
+.topics-grid { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.topic-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: border-color 0.15s;
+}
+.topic-card:active { border-color: var(--accent); }
+.topic-emoji { font-size: 24px; margin-bottom: 8px; }
+.topic-name { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; margin-bottom: 3px; }
+.topic-count { font-size: 11px; color: var(--text-2); }
+
+.draft-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.draft-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-2); margin-bottom: 8px; }
+.draft-text { font-size: 14px; line-height: 1.6; color: var(--text-1); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.draft-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+
+/* ── LIBRARY ── */
+.filter-row { padding: 12px 20px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-btn {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 100px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--text-2); transition: all 0.15s; -webkit-tap-highlight-color: transparent; font-family: inherit;
+}
+.filter-btn.on { border-color: var(--accent); background: var(--accent-2); color: var(--accent); }
+
+.out-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.out-head { padding: 14px 16px 10px; }
+.out-skill { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.out-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3; }
+.out-body { padding: 0 16px 14px; font-size: 13px; color: var(--text-2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.out-foot { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+
+/* ── Panels ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; }
+.overlay.open { display: block; }
+.panel {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(105%);
+  width: 100%; max-width: 480px; background: var(--surface);
+  border-radius: 24px 24px 0 0; z-index: 201; max-height: 92vh; overflow-y: auto;
+  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+.panel.open { transform: translateX(-50%) translateY(0); }
+.panel-handle { width: 36px; height: 4px; background: var(--border); border-radius: 100px; margin: 12px auto 0; }
+.panel-head { padding: 16px 20px 14px; border-bottom: 1px solid var(--border); }
+.panel-skill-icon { font-size: 28px; margin-bottom: 6px; }
+.panel-title { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+.panel-sub { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+.panel-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+.panel-footer { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+
+/* output panel */
+.out-panel-section { margin-bottom: 18px; }
+.out-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); margin-bottom: 8px; }
+.out-section-body { font-size: 14px; line-height: 1.7; color: var(--text-1); }
+.out-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.out-bullets li { font-size: 14px; line-height: 1.6; padding-left: 18px; position: relative; }
+.out-bullets li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+.out-callout { background: var(--accent-2); border-radius: 12px; padding: 14px; }
+.out-callout-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 6px; }
+.out-callout-text { font-size: 13px; line-height: 1.6; color: var(--accent-3); }
+
+/* toast */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--text-1); color: white; padding: 10px 20px;
+  border-radius: 100px; font-size: 13px; font-weight: 600; opacity: 0;
+  transition: all 0.22s; z-index: 400; white-space: nowrap; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.spacer-20 { height: 20px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ── -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-title">Design Companion</div>
+      <div class="header-sub" id="header-sub">Monday, Jun 22</div>
+    </div>
+    <button class="header-btn" onclick="showToast('Settings coming in M4')">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="2" fill="currentColor"/>
+        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ── HOME TAB ── -->
+  <div id="tab-home" class="tab-content active">
+    <div class="home-top">
+      <div class="home-date">Monday, June 22</div>
+      <div class="home-greeting">Good morning,<br>Daniel.</div>
+      <div class="context-pill" onclick="showToast('Project selector coming in M4')">
+        <span class="dot"></span> No active project · Set context
+      </div>
+    </div>
+
+    <div class="section-header" style="padding-top:24px">
+      <span class="section-title">Quick actions</span>
+    </div>
+    <div class="quick-scroll">
+      <div class="quick-card" onclick="openPanel('critique')">
+        <div class="quick-icon" style="background:var(--accent-2)">✦</div>
+        <div class="quick-name">Design Critique</div>
+        <div class="quick-desc">Get structured feedback on any screen</div>
+      </div>
+      <div class="quick-card" onclick="openPanel('a11y')">
+        <div class="quick-icon" style="background:var(--green-2)">◎</div>
+        <div class="quick-name">A11y Review</div>
+        <div class="quick-desc">WCAG 2.1 AA audit on any component</div>
+      </div>
+      <div class="quick-card" onclick="openPanel('handoff')">
+        <div class="quick-icon" style="background:var(--blue-2)">⌥</div>
+        <div class="quick-name">Dev Handoff</div>
+        <div class="quick-desc">Generate a spec engineers can act on</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">Recent captures</span>
+      <button class="section-link" onclick="switchTab('capture')">See all</button>
+    </div>
+    <div class="item-list">
+      <div class="item-card" onclick="switchTab('capture')">
+        <div class="item-top">
+          <span class="item-title">Design Tokens and Multi-Brand Systems</span>
+          <span class="item-time">2d</span>
+        </div>
+        <div class="item-preview">The article argues that design tokens aren't a naming convention problem — they're a decision-layer problem. The real tension is between what a token means and where it gets applied.</div>
+        <div class="item-footer">
+          <span class="chip chip-accent">Article</span>
+          <span class="chip chip-neutral">Nielsen Norman</span>
+        </div>
+      </div>
+      <div class="item-card" onclick="switchTab('capture')">
+        <div class="item-top">
+          <span class="item-title">How Linear Redesigned Their Mobile App</span>
+          <span class="item-time">4d</span>
+        </div>
+        <div class="item-preview">Linear cut their mobile nav from 7 items to 4, removed the sidebar entirely, and rebuilt around a command palette as the primary navigation model on mobile.</div>
+        <div class="item-footer">
+          <span class="chip chip-purple">Competitive</span>
+          <span class="chip chip-neutral">Linear Blog</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">Recent outputs</span>
+      <button class="section-link" onclick="switchTab('library')">See all</button>
+    </div>
+    <div class="item-list">
+      <div class="item-card" onclick="openOutputPanel()">
+        <div class="item-top">
+          <span class="item-title">Hedging Tool — Filter Panel Critique</span>
+          <span class="item-time">3d</span>
+        </div>
+        <div class="item-preview">Three priority issues: filter chips don't communicate applied state, the "Reset" action is placed where users expect a confirm, and the panel lacks a loading state for slow queries.</div>
+        <div class="item-footer">
+          <span class="chip chip-accent">Design Critique</span>
+        </div>
+      </div>
+      <div class="item-card" onclick="showToast('Full output in Library')">
+        <div class="item-top">
+          <span class="item-title">Customer Portal — Nav Accessibility</span>
+          <span class="item-time">5d</span>
+        </div>
+        <div class="item-preview">Focus order breaks on the second nav level. Tab stops skip two interactive elements. Contrast ratio on disabled states is 2.1:1 — below the 3:1 minimum for large text.</div>
+        <div class="item-footer">
+          <span class="chip chip-green">A11y Review</span>
+        </div>
+      </div>
+    </div>
+    <div class="spacer-20"></div>
+  </div>
+
+  <!-- ── TOOLS TAB ── -->
+  <div id="tab-tools" class="tab-content">
+    <div class="tools-pad">
+      <div class="tools-group-label">PM Input</div>
+      <div class="skill-list">
+        <div class="skill-card" onclick="openPanel('brief')">
+          <div class="skill-icon" style="background:var(--amber-2)">📋</div>
+          <div class="skill-info">
+            <div class="skill-name">PM Brief Intake</div>
+            <div class="skill-desc">Turn a brief into structured UX questions</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="skill-card" onclick="openPanel('synthesis')">
+          <div class="skill-icon" style="background:var(--teal-2)">◈</div>
+          <div class="skill-info">
+            <div class="skill-name">Research Synthesis</div>
+            <div class="skill-desc">Themes and decisions from raw research</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="tools-group-label">Design</div>
+      <div class="skill-list">
+        <div class="skill-card" onclick="openPanel('critique')">
+          <div class="skill-icon" style="background:var(--accent-2)">✦</div>
+          <div class="skill-info">
+            <div class="skill-name">Design Critique</div>
+            <div class="skill-desc">Usability, hierarchy, and consistency feedback</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="skill-card" onclick="openPanel('uxcopy')">
+          <div class="skill-icon" style="background:var(--orange-2)">◇</div>
+          <div class="skill-info">
+            <div class="skill-name">UX Copy</div>
+            <div class="skill-desc">Microcopy, error states, CTAs, empty states</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="skill-card" onclick="openPanel('system')">
+          <div class="skill-icon" style="background:var(--purple-2)">⬡</div>
+          <div class="skill-info">
+            <div class="skill-name">Design System Audit</div>
+            <div class="skill-desc">Naming, tokens, and consistency check</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="tools-group-label">Dev Output</div>
+      <div class="skill-list">
+        <div class="skill-card" onclick="openPanel('a11y')">
+          <div class="skill-icon" style="background:var(--green-2)">◎</div>
+          <div class="skill-info">
+            <div class="skill-name">Accessibility Review</div>
+            <div class="skill-desc">WCAG 2.1 AA audit with exportable checklist</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="skill-card" onclick="openPanel('handoff')">
+          <div class="skill-icon" style="background:var(--blue-2)">⌥</div>
+          <div class="skill-info">
+            <div class="skill-name">Dev Handoff</div>
+            <div class="skill-desc">Layout, tokens, props, states, and animation</div>
+          </div>
+          <svg class="skill-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CAPTURE TAB ── -->
+  <div id="tab-capture" class="tab-content">
+    <div class="capture-top">
+      <div class="capture-label">Add a design reference</div>
+      <div class="type-row">
+        <button class="type-btn on" onclick="setType(this,'url')">URL</button>
+        <button class="type-btn" onclick="setType(this,'text')">Text</button>
+        <button class="type-btn" onclick="setType(this,'note')">Note</button>
+      </div>
+      <div class="capture-row">
+        <input class="input" id="capture-input" placeholder="Paste a URL, LinkedIn post, or article link…" />
+        <button class="btn btn-primary btn-sm" onclick="runCapture()">Analyze</button>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">Saved references</span>
+      <span style="font-size:12px;color:var(--text-3)">3 captures</span>
+    </div>
+
+    <div id="capture-feed" class="capture-feed">
+
+      <div class="cap-card" onclick="openPostFromCapture()">
+        <div class="cap-header">
+          <div class="cap-type" style="color:var(--accent)">Article</div>
+          <div class="cap-title">Design Tokens and Multi-Brand Design Systems</div>
+          <div class="cap-source">Smashing Magazine · Jun 20, 2026</div>
+        </div>
+        <div class="cap-brief">
+          <div class="cap-brief-title">Three things that matter</div>
+          <ul class="cap-points">
+            <li>Tokens work as a decision layer, not a naming convention — the architecture separates what a value means from where it's used</li>
+            <li>Multi-brand systems need three tiers: global (primitives), semantic (decisions), and component-scoped (overrides)</li>
+            <li>The migration path that works: replace hardcoded values first, establish semantic names second, never the other way</li>
+          </ul>
+        </div>
+        <div class="cap-relevance">
+          <div class="cap-relevance-label">Why it matters for your work</div>
+          <div class="cap-relevance-text">The Hedging Tool uses at least 14 hardcoded color values in the filter panel alone. The three-tier model gives you a migration order that doesn't break existing components mid-refactor.</div>
+        </div>
+        <div class="cap-actions">
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showToast('Copied to clipboard')">Copy brief</button>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openPostFromCapture()">Write post</button>
+        </div>
+      </div>
+
+      <div class="cap-card" onclick="openPostFromCapture()">
+        <div class="cap-header">
+          <div class="cap-type" style="color:var(--purple)">Competitive</div>
+          <div class="cap-title">How Linear Redesigned Their Mobile App</div>
+          <div class="cap-source">Linear Blog · Jun 18, 2026</div>
+        </div>
+        <div class="cap-brief">
+          <div class="cap-brief-title">Three things that matter</div>
+          <ul class="cap-points">
+            <li>Reduced primary nav from 7 to 4 items by collapsing secondary views into context menus, not a deeper hierarchy</li>
+            <li>Command palette as the primary navigation model replaced the sidebar — search intent replaces browse intent on mobile</li>
+            <li>Swipe gestures handle state changes (done, cancel, reassign) that previously required three taps and a modal</li>
+          </ul>
+        </div>
+        <div class="cap-relevance">
+          <div class="cap-relevance-label">Why it matters for your work</div>
+          <div class="cap-relevance-text">The Customer Portal's mobile nav has the same problem Linear had: too many top-level items that don't survive thumb-reachability testing. The command palette pattern is worth prototyping for the portfolio section.</div>
+        </div>
+        <div class="cap-actions">
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showToast('Copied to clipboard')">Copy brief</button>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openPostFromCapture()">Write post</button>
+        </div>
+      </div>
+
+      <div class="cap-card" onclick="openPostFromCapture()">
+        <div class="cap-header">
+          <div class="cap-type" style="color:var(--teal)">Research</div>
+          <div class="cap-title">State of Accessibility 2026 Report</div>
+          <div class="cap-source">A11y Project · Jun 10, 2026</div>
+        </div>
+        <div class="cap-brief">
+          <div class="cap-brief-title">Three things that matter</div>
+          <ul class="cap-points">
+            <li>96.3% of homepage homepages tested had detectable WCAG failures — same number as 2023, suggesting tooling adoption hasn't moved the needle</li>
+            <li>The three most common failures are still low contrast text, missing alt text, and unlabeled form inputs</li>
+            <li>Automated tools catch 30–40% of failures; the rest require manual testing with AT users</li>
+          </ul>
+        </div>
+        <div class="cap-relevance">
+          <div class="cap-relevance-label">Why it matters for your work</div>
+          <div class="cap-relevance-text">The Customer Portal hasn't had a manual AT audit. Automated checks pass, which means nothing about the 60–70% of issues those checks don't catch. This is a gap to flag before the next release.</div>
+        </div>
+        <div class="cap-actions">
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showToast('Copied to clipboard')">Copy brief</button>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openPostFromCapture()">Write post</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="spacer-20"></div>
+  </div>
+
+  <!-- ── POSTS TAB ── -->
+  <div id="tab-posts" class="tab-content">
+    <div class="posts-modes">
+      <button class="mode-btn on" onclick="setMode(this,'ref')">From reference</button>
+      <button class="mode-btn" onclick="setMode(this,'topic')">Topic library</button>
+    </div>
+
+    <div id="posts-ref-view">
+      <div class="section-header">
+        <span class="section-title">Pick a capture to write about</span>
+      </div>
+      <div class="item-list">
+        <div class="item-card" onclick="openPostFromCapture()">
+          <div class="item-top">
+            <span class="item-title">Design Tokens and Multi-Brand Systems</span>
+            <span class="chip chip-accent">Article</span>
+          </div>
+          <div class="item-preview">Three tiers: global, semantic, component-scoped. The migration path that works: primitives first.</div>
+        </div>
+        <div class="item-card" onclick="openPostFromCapture()">
+          <div class="item-top">
+            <span class="item-title">How Linear Redesigned Their Mobile App</span>
+            <span class="chip chip-purple">Competitive</span>
+          </div>
+          <div class="item-preview">Command palette as primary navigation. Swipe for state changes. Nav reduced from 7 to 4.</div>
+        </div>
+        <div class="item-card" onclick="openPostFromCapture()">
+          <div class="item-top">
+            <span class="item-title">State of Accessibility 2026 Report</span>
+            <span class="chip chip-teal">Research</span>
+          </div>
+          <div class="item-preview">96.3% of homepages have WCAG failures. Automated tools catch only 30–40% of them.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="posts-topic-view" style="display:none">
+      <div class="section-header">
+        <span class="section-title">Design topics</span>
+      </div>
+      <div class="topics-grid">
+        <div class="topic-card" onclick="openTopicPost('Progressive Disclosure')">
+          <div class="topic-emoji">🎛</div>
+          <div class="topic-name">Progressive Disclosure</div>
+          <div class="topic-count">12 post angles</div>
+        </div>
+        <div class="topic-card" onclick="openTopicPost('Design Tokens')">
+          <div class="topic-emoji">🎨</div>
+          <div class="topic-name">Design Tokens</div>
+          <div class="topic-count">9 post angles</div>
+        </div>
+        <div class="topic-card" onclick="openTopicPost('Mobile Navigation')">
+          <div class="topic-emoji">📱</div>
+          <div class="topic-name">Mobile Navigation</div>
+          <div class="topic-count">15 post angles</div>
+        </div>
+        <div class="topic-card" onclick="openTopicPost('Error States')">
+          <div class="topic-emoji">⚠️</div>
+          <div class="topic-name">Error States</div>
+          <div class="topic-count">8 post angles</div>
+        </div>
+        <div class="topic-card" onclick="openTopicPost('Accessibility')">
+          <div class="topic-emoji">♿</div>
+          <div class="topic-name">Accessibility</div>
+          <div class="topic-count">18 post angles</div>
+        </div>
+        <div class="topic-card" onclick="openTopicPost('Design Critique')">
+          <div class="topic-emoji">✦</div>
+          <div class="topic-name">Design Critique</div>
+          <div class="topic-count">11 post angles</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-header" style="margin-top:12px">
+      <span class="section-title">Draft queue</span>
+      <span style="font-size:12px;color:var(--text-3)">1 draft</span>
+    </div>
+    <div class="item-list">
+      <div class="draft-card" onclick="openDraftPanel()">
+        <div class="draft-label">Draft · From reference</div>
+        <div class="draft-text">Most design token implementations fail at the semantic layer.
+
+Not because naming is hard. Because teams skip the step where they decide what the token *means* before they decide what it's called.
+
+A color called `blue-500` is a primitive. A color called `action-primary` is a decision. The difference matters when you're trying to support multiple brands, themes, or contexts — the primitive says nothing about intent.</div>
+        <div class="draft-footer">
+          <span class="chip chip-neutral">Design Tokens</span>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();showToast('Copied to clipboard ✓')">Copy</button>
+        </div>
+      </div>
+    </div>
+    <div class="spacer-20"></div>
+  </div>
+
+  <!-- ── LIBRARY TAB ── -->
+  <div id="tab-library" class="tab-content">
+    <div class="filter-row">
+      <button class="filter-btn on" onclick="setFilter(this)">All</button>
+      <button class="filter-btn" onclick="setFilter(this)">Critique</button>
+      <button class="filter-btn" onclick="setFilter(this)">A11y</button>
+      <button class="filter-btn" onclick="setFilter(this)">Handoff</button>
+      <button class="filter-btn" onclick="setFilter(this)">UX Copy</button>
+    </div>
+    <div class="item-list">
+      <div class="out-card" onclick="openOutputPanel()">
+        <div class="out-head">
+          <div class="out-skill" style="color:var(--accent)">Design Critique</div>
+          <div class="out-title">Hedging Tool — Filter Panel</div>
+        </div>
+        <div class="out-body">Three priority issues: filter chips don't communicate applied state, the "Reset" action is placed where users expect a confirm, and the panel lacks a loading state for slow queries.</div>
+        <div class="out-foot">
+          <span class="chip chip-neutral">3 days ago</span>
+          <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();showToast('Copied ✓')">Copy</button>
+        </div>
+      </div>
+      <div class="out-card" onclick="showToast('Opening output…')">
+        <div class="out-head">
+          <div class="out-skill" style="color:var(--green)">Accessibility Review</div>
+          <div class="out-title">Customer Portal — Navigation</div>
+        </div>
+        <div class="out-body">Focus order breaks on the second nav level. Tab stops skip two interactive elements. Contrast ratio on disabled states is 2.1:1 — below the 3:1 minimum for large text.</div>
+        <div class="out-foot">
+          <span class="chip chip-neutral">5 days ago</span>
+          <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();showToast('Copied ✓')">Copy</button>
+        </div>
+      </div>
+      <div class="out-card" onclick="showToast('Opening output…')">
+        <div class="out-head">
+          <div class="out-skill" style="color:var(--blue)">Dev Handoff</div>
+          <div class="out-title">Date Range Picker Component</div>
+        </div>
+        <div class="out-body">Layout: 320px min-width, full-width on mobile. Tokens: uses surface-2 for calendar background, action-primary for selected range. Three interaction states: idle, selecting, confirmed.</div>
+        <div class="out-foot">
+          <span class="chip chip-neutral">1 week ago</span>
+          <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();showToast('Copied ✓')">Copy</button>
+        </div>
+      </div>
+      <div class="out-card" onclick="showToast('Opening output…')">
+        <div class="out-head">
+          <div class="out-skill" style="color:var(--orange)">UX Copy</div>
+          <div class="out-title">Error Messages — Hedging Tool</div>
+        </div>
+        <div class="out-body">Rewrote 12 error messages. Main change: removed "Sorry, an error occurred" openers and replaced with what the user should do next. Validation errors now name the specific field and reason.</div>
+        <div class="out-foot">
+          <span class="chip chip-neutral">2 weeks ago</span>
+          <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();showToast('Copied ✓')">Copy</button>
+        </div>
+      </div>
+    </div>
+    <div class="spacer-20"></div>
+  </div>
+
+  <!-- ── BOTTOM NAV ── -->
+  <nav id="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 20v-8h6v8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+    </div>
+    Home
+  </button>
+  <button class="nav-item" id="nav-tools" onclick="switchTab('tools')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.7"/></svg>
+    </div>
+    Tools
+  </button>
+  <button class="nav-item" id="nav-capture" onclick="switchTab('capture')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M11 7v8M7 11h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </div>
+    Capture
+  </button>
+  <button class="nav-item" id="nav-posts" onclick="switchTab('posts')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 17.5V14l9.5-9.5a2 2 0 012.83 0l1.17 1.17a2 2 0 010 2.83L8 18H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12.5 5.5l3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </div>
+    Posts
+  </button>
+  <button class="nav-item" id="nav-library" onclick="switchTab('library')">
+    <div class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="15" width="16" height="4" rx="1" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="9" width="16" height="4" rx="1" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="3" width="16" height="4" rx="1" stroke="currentColor" stroke-width="1.7"/></svg>
+    </div>
+    Library
+  </button>
+  </nav>
+</div>
+
+<!-- ── OVERLAYS ── -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+<!-- Skill input panel -->
+<div class="panel" id="skill-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-head">
+    <div class="panel-skill-icon" id="panel-icon">✦</div>
+    <div class="panel-title" id="panel-title">Design Critique</div>
+    <div class="panel-sub" id="panel-sub">Describe what you're designing and get structured feedback</div>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+  <div class="panel-footer">
+    <button class="btn btn-primary btn-full" id="panel-run-btn" onclick="runSkill()">Run critique</button>
+    <button class="btn btn-secondary btn-full" onclick="closePanel()">Cancel</button>
+  </div>
+</div>
+
+<!-- Output panel -->
+<div class="panel" id="output-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-head">
+    <div class="panel-skill-icon">✦</div>
+    <div class="panel-title">Hedging Tool — Filter Panel</div>
+    <div class="panel-sub">Design Critique · 3 days ago</div>
+  </div>
+  <div class="panel-body">
+    <div class="out-panel-section">
+      <div class="out-section-label">What was reviewed</div>
+      <div class="out-section-body">The filter panel in the Hedging Tool's position management screen, specifically the chip-based filter row, the reset affordance, and the loading/empty states after a filter is applied.</div>
+    </div>
+    <div class="out-panel-section">
+      <div class="out-section-label">Priority issues</div>
+      <ul class="out-bullets">
+        <li>Filter chips don't differentiate between "available" and "applied" state — the only visual change is a background fill that fails the 3:1 contrast check in light mode</li>
+        <li>The "Reset filters" button sits in the bottom-right corner, where most users scan for a confirm/apply action. It gets triggered accidentally when users try to confirm a filter set</li>
+        <li>No loading state after a filter is applied — the table either refreshes instantly (dev environment) or takes 1–3 seconds (production). No skeleton, no spinner, no indication that something is happening</li>
+      </ul>
+    </div>
+    <div class="out-callout">
+      <div class="out-callout-label">Recommended fix order</div>
+      <div class="out-callout-text">Fix the loading state first — it costs nothing in design effort and removes the most visible production bug. Then the Reset placement. Token contrast is a design system issue, not a one-off fix.</div>
+    </div>
+    <div class="out-panel-section" style="margin-top:18px">
+      <div class="out-section-label">What's working</div>
+      <div class="out-section-body">The filter chip labels are specific and scannable. The panel's visual weight doesn't compete with the table data. Dismissal on outside click is correctly implemented.</div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <button class="btn btn-primary btn-full" onclick="showToast('Copied to clipboard ✓');closeOutputPanel()">Copy output</button>
+    <button class="btn btn-secondary btn-full" onclick="closeOutputPanel()">Close</button>
+  </div>
+</div>
+
+<!-- Post draft panel -->
+<div class="panel" id="post-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-head">
+    <div class="panel-skill-icon">✍️</div>
+    <div class="panel-title" id="post-panel-title">Post draft</div>
+    <div class="panel-sub" id="post-panel-sub">From saved reference · 3 angles</div>
+  </div>
+  <div class="panel-body" id="post-panel-body">
+    <!-- filled by JS -->
+  </div>
+  <div class="panel-footer">
+    <button class="btn btn-primary btn-full" onclick="showToast('Copied to clipboard ✓');closePostPanel()">Copy post</button>
+    <button class="btn btn-secondary btn-full" onclick="closePostPanel()">Save to drafts</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+let activeTab = 'home';
+let activeSkill = null;
+let captureType = 'url';
+let postsMode = 'ref';
+
+// ── Navigation ──
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  activeTab = tab;
+}
+
+// ── Capture type ──
+function setType(btn, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  captureType = type;
+  const input = document.getElementById('capture-input');
+  input.placeholder = type === 'url' ? 'Paste a URL, LinkedIn post, or article link…'
+    : type === 'text' ? 'Paste text, a quote, or a snippet…'
+    : 'Write a quick note or observation…';
+}
+
+// ── Posts mode ──
+function setMode(btn, mode) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  postsMode = mode;
+  document.getElementById('posts-ref-view').style.display = mode === 'ref' ? 'block' : 'none';
+  document.getElementById('posts-topic-view').style.display = mode === 'topic' ? 'block' : 'none';
+}
+
+// ── Filter chips ──
+function setFilter(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ── Skill chips ──
+function toggleChip(el) {
+  const group = el.dataset.group;
+  if (group) {
+    document.querySelectorAll(`.sel-chip[data-group="${group}"]`).forEach(c => c.classList.remove('on'));
+  }
+  el.classList.toggle('on');
+}
+
+// ── Panels ──
+const skillDefs = {
+  critique: {
+    icon: '✦', title: 'Design Critique',
+    sub: 'Describe the screen or flow — get structured feedback on usability, hierarchy, and consistency',
+    runLabel: 'Run critique',
+    form: `
+      <div class="form-group">
+        <label class="form-label">What are you designing?</label>
+        <textarea class="input" rows="4" placeholder="Describe the screen, component, or flow. What does it do? What's the user trying to accomplish?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Design stage</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="stage" onclick="toggleChip(this)">Exploration</button>
+          <button class="sel-chip" data-group="stage" onclick="toggleChip(this)">Refinement</button>
+          <button class="sel-chip" data-group="stage" onclick="toggleChip(this)">Final polish</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Focus areas <span class="form-hint">(optional)</span></label>
+        <div class="chips-row">
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Visual hierarchy</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Usability</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Consistency</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Mobile</button>
+        </div>
+      </div>`
+  },
+  a11y: {
+    icon: '◎', title: 'Accessibility Review',
+    sub: 'WCAG 2.1 AA audit — get a prioritized issue list and exportable checklist',
+    runLabel: 'Run audit',
+    form: `
+      <div class="form-group">
+        <label class="form-label">What are you auditing?</label>
+        <textarea class="input" rows="3" placeholder="Name the screen or component and describe its interactive elements. E.g. 'Filter panel with 8 toggle chips and a Reset button.'"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Page or component type</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="type" onclick="toggleChip(this)">Form</button>
+          <button class="sel-chip" data-group="type" onclick="toggleChip(this)">Navigation</button>
+          <button class="sel-chip" data-group="type" onclick="toggleChip(this)">Data table</button>
+          <button class="sel-chip" data-group="type" onclick="toggleChip(this)">Modal</button>
+          <button class="sel-chip" data-group="type" onclick="toggleChip(this)">Other</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Known AT usage?</label>
+        <div class="chips-row">
+          <button class="sel-chip" data-group="at" onclick="toggleChip(this)">Screen reader</button>
+          <button class="sel-chip" data-group="at" onclick="toggleChip(this)">Keyboard only</button>
+          <button class="sel-chip" data-group="at" onclick="toggleChip(this)">Unknown</button>
+        </div>
+      </div>`
+  },
+  handoff: {
+    icon: '⌥', title: 'Dev Handoff',
+    sub: 'Generate a spec covering layout, tokens, props, states, and interactions',
+    runLabel: 'Generate spec',
+    form: `
+      <div class="form-group">
+        <label class="form-label">Component or feature name</label>
+        <input class="input" placeholder="E.g. 'Date Range Picker', 'Filter Panel'">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Describe the component</label>
+        <textarea class="input" rows="4" placeholder="What does it do? What are its states? Any specific behavior to call out for the developer?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Include sections</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">Layout</button>
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">Tokens</button>
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">Props</button>
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">States</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Animation</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">A11y notes</button>
+        </div>
+      </div>`
+  },
+  uxcopy: {
+    icon: '◇', title: 'UX Copy',
+    sub: 'Write microcopy, error messages, empty states, CTAs, and onboarding text',
+    runLabel: 'Generate copy',
+    form: `
+      <div class="form-group">
+        <label class="form-label">UI element type</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="el" onclick="toggleChip(this)">Error message</button>
+          <button class="sel-chip" data-group="el" onclick="toggleChip(this)">CTA button</button>
+          <button class="sel-chip" data-group="el" onclick="toggleChip(this)">Empty state</button>
+          <button class="sel-chip" data-group="el" onclick="toggleChip(this)">Tooltip</button>
+          <button class="sel-chip" data-group="el" onclick="toggleChip(this)">Confirmation</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Context</label>
+        <textarea class="input" rows="3" placeholder="What happened? What does the user need to do next? What's the product context?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tone</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="tone" onclick="toggleChip(this)">Clear and direct</button>
+          <button class="sel-chip" data-group="tone" onclick="toggleChip(this)">Friendly</button>
+          <button class="sel-chip" data-group="tone" onclick="toggleChip(this)">Technical</button>
+        </div>
+      </div>`
+  },
+  system: {
+    icon: '⬡', title: 'Design System Audit',
+    sub: 'Check naming consistency, hardcoded values, and component coverage',
+    runLabel: 'Run audit',
+    form: `
+      <div class="form-group">
+        <label class="form-label">What are you auditing?</label>
+        <textarea class="input" rows="3" placeholder="List the components or areas. E.g. 'Button variants, form inputs, color token usage across filter components.'"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Audit focus</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">Naming</button>
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">Token usage</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Hardcoded values</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Documentation</button>
+        </div>
+      </div>`
+  },
+  brief: {
+    icon: '📋', title: 'PM Brief Intake',
+    sub: 'Paste a PM brief — get structured UX questions and scoping gaps',
+    runLabel: 'Process brief',
+    form: `
+      <div class="form-group">
+        <label class="form-label">Paste the brief</label>
+        <textarea class="input" rows="6" placeholder="Paste the PM's brief, ticket description, or requirement doc here…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">What do you need from this?</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="" onclick="toggleChip(this)">UX questions to ask</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Scope gaps</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Success criteria</button>
+          <button class="sel-chip" data-group="" onclick="toggleChip(this)">Risk flags</button>
+        </div>
+      </div>`
+  },
+  synthesis: {
+    icon: '◈', title: 'Research Synthesis',
+    sub: 'Paste raw research — get themes, insights, and ranked findings',
+    runLabel: 'Synthesize',
+    form: `
+      <div class="form-group">
+        <label class="form-label">Research input</label>
+        <textarea class="input" rows="6" placeholder="Paste interview notes, survey responses, usability test observations, or support tickets…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Research type</label>
+        <div class="chips-row">
+          <button class="sel-chip on" data-group="rt" onclick="toggleChip(this)">Interviews</button>
+          <button class="sel-chip" data-group="rt" onclick="toggleChip(this)">Survey</button>
+          <button class="sel-chip" data-group="rt" onclick="toggleChip(this)">Usability test</button>
+          <button class="sel-chip" data-group="rt" onclick="toggleChip(this)">Support tickets</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Focus question <span class="form-hint">(optional)</span></label>
+        <input class="input" placeholder="E.g. 'Why do users abandon the filter flow?'">
+      </div>`
+  }
+};
+
+function openPanel(skill) {
+  activeSkill = skill;
+  const def = skillDefs[skill];
+  document.getElementById('panel-icon').textContent = def.icon;
+  document.getElementById('panel-title').textContent = def.title;
+  document.getElementById('panel-sub').textContent = def.sub;
+  document.getElementById('panel-body').innerHTML = def.form;
+  document.getElementById('panel-run-btn').textContent = def.runLabel;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('skill-panel').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('skill-panel').classList.remove('open');
+  document.getElementById('output-panel').classList.remove('open');
+  document.getElementById('post-panel').classList.remove('open');
+}
+
+function openOutputPanel() {
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('output-panel').classList.add('open');
+}
+function closeOutputPanel() { closePanel(); }
+
+function runSkill() {
+  closePanel();
+  setTimeout(() => { openOutputPanel(); }, 200);
+}
+
+// ── Helpers ──
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Capture ──
+async function runCapture() {
+  const input = document.getElementById('capture-input');
+  const url = input.value.trim();
+  if (!url) { showToast('Paste a URL or text first'); return; }
+
+  const feed = document.getElementById('capture-feed');
+  const tempCard = document.createElement('div');
+  tempCard.className = 'cap-card';
+  tempCard.innerHTML = `
+    <div class="enrich-loading">
+      <div class="pulse"></div>
+      <span class="enrich-loading-text">Fetching and enriching…</span>
+    </div>`;
+  feed.insertBefore(tempCard, feed.firstChild);
+  input.value = '';
+
+  try {
+    const resp = await fetch('/api/enrich', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, inputType: captureType }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Enrichment failed');
+
+    tempCard.setAttribute('onclick', 'openPostFromCapture()');
+    tempCard.innerHTML = `
+      <div class="cap-header">
+        <div class="cap-type" style="color:${escHtml(data.typeColor || 'var(--accent)')}">${escHtml(data.type || 'Article')}</div>
+        <div class="cap-title">${escHtml(data.title || '')}</div>
+        <div class="cap-source">${escHtml(data.source || '')}</div>
+      </div>
+      <div class="cap-brief">
+        <div class="cap-brief-title">Three things that matter</div>
+        <ul class="cap-points">
+          ${(data.points || []).map(p => `<li>${escHtml(p)}</li>`).join('')}
+        </ul>
+      </div>
+      ${data.relevance ? `<div class="cap-relevance">
+        <div class="cap-relevance-label">Why it matters for your work</div>
+        <div class="cap-relevance-text">${escHtml(data.relevance)}</div>
+      </div>` : ''}
+      <div class="cap-actions">
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showToast('Copied to clipboard ✓')">Copy brief</button>
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openPostFromCapture()">Write post</button>
+      </div>`;
+    showToast('Reference saved ✓');
+  } catch (e) {
+    tempCard.remove();
+    showToast('Could not enrich: ' + e.message);
+  }
+}
+
+// ── Post panels ──
+const postAngles = {
+  ref: [
+    {
+      label: 'Educational angle',
+      text: `Most design token implementations fail at the semantic layer.
+
+Not because naming is hard. Because teams skip the step where they decide what the token *means* before they decide what it's called.
+
+A color called \`blue-500\` is a primitive. A color called \`action-primary\` is a decision.
+
+The difference matters when you're supporting multiple brands or themes. The primitive says nothing about intent — you can't swap it without auditing every usage. The semantic name tells the system what to replace and why.
+
+Three tiers. In this order:
+1. Global primitives (values with no opinion)
+2. Semantic decisions (values with a job)
+3. Component overrides (values scoped to a specific context)
+
+Most teams do 1 and 3. They skip 2 and wonder why theming is hard.`
+    },
+    {
+      label: 'Opinion angle',
+      text: `Design tokens are not a design system problem. They're a communication problem.
+
+The reason most token migrations stall: the people naming tokens and the people using them have different mental models of what a token is for.
+
+Designers think in components. Engineers think in values. Neither is wrong — they're working at different layers.
+
+The token is the translation layer between those two worlds. If the translation is wrong, both sides pay the cost.
+
+Getting this right isn't about better tooling. It's about sitting in a room with your engineers and agreeing on what "semantic" means in your context before you write a single token name.`
+    },
+    {
+      label: 'Story angle',
+      text: `Last year I inherited a design system with 340 color values and zero semantic tokens.
+
+Every component had hardcoded hex values. Every new feature added 3 more. The "design system" was a Figma library with no connection to how the product was actually built.
+
+The migration took 4 months. Here's what worked:
+
+Replace hardcoded values first. Don't name them yet — just find them and group them by usage pattern. You'll see 40 "grey" values collapse into 8.
+
+Then name what the groups do, not what they look like. `bg-disabled` not `grey-200`.
+
+Then map component scopes. Some tokens only make sense inside a specific component. That's fine.
+
+We went from 340 values to 94. The product looks the same. The codebase doesn't.`
+    }
+  ],
+  topic: {
+    'Progressive Disclosure': `Progressive disclosure is one of the oldest UX principles and still one of the most violated.
+
+The idea: show only what the user needs right now. Reveal complexity on demand, not by default.
+
+Where it breaks down: designers confuse "hiding" with "progressive disclosure." Hiding creates confusion. Progressive disclosure creates confidence.
+
+The test: if the user has to look for something they need *right now*, you hid it. If they find it exactly when they need it, you disclosed it progressively.
+
+Three patterns that actually work:
+— Collapsed sections that open when a related action is taken
+— Advanced options that appear after the basic flow is complete
+— Detail panels that expand in context, not in a new screen
+
+The nav redesign that reduced options from 7 to 4 didn't remove features. It moved them to where users were when they needed them.`,
+    'default': `Designers spend a lot of time on what a UI looks like.
+
+Not enough time on what it *does* when something goes wrong.
+
+Error states are where users are most likely to abandon. They're also the least-designed screens in most products.
+
+Three things I've learned from auditing error messages:
+
+1. Don't start with "Sorry." The user didn't do anything wrong — something failed. Acknowledge what failed.
+
+2. Name the specific field or action. "Something went wrong" is not an error message. "Date must be after today's date" is.
+
+3. Tell them what to do next. The job of an error message isn't to explain — it's to unblock.
+
+The difference between a good and bad error state isn't copy. It's whether the designer thought about what the user is feeling when they see it.`
+  }
+};
+
+function openPostFromCapture() {
+  document.getElementById('post-panel-title').textContent = 'Post draft';
+  document.getElementById('post-panel-sub').textContent = 'From saved reference · 3 angles';
+
+  let html = '';
+  postAngles.ref.forEach((angle, i) => {
+    html += `
+      <div style="border:1.5px solid var(--border);border-radius:14px;overflow:hidden;${i===0?'border-color:var(--accent);background:var(--accent-2)':''}">
+        <div style="padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:${i===0?'var(--accent)':'var(--text-2)'}">${angle.label}</span>
+          <button class="btn btn-sm btn-secondary" onclick="showToast('Copied ✓')" style="padding:4px 10px;font-size:11px">Copy</button>
+        </div>
+        <div style="padding:0 14px 14px;font-size:13px;line-height:1.7;color:var(--text-1);white-space:pre-line">${angle.text}</div>
+      </div>`;
+  });
+
+  document.getElementById('post-panel-body').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('post-panel').classList.add('open');
+}
+
+function openTopicPost(topic) {
+  document.getElementById('post-panel-title').textContent = topic;
+  document.getElementById('post-panel-sub').textContent = 'Topic library · 1 draft';
+
+  const text = postAngles.topic[topic] || postAngles.topic['default'];
+  document.getElementById('post-panel-body').innerHTML = `
+    <div style="border:1.5px solid var(--accent);border-radius:14px;background:var(--accent-2);overflow:hidden">
+      <div style="padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">Generated draft</span>
+        <button class="btn btn-sm btn-secondary" onclick="showToast('Copied ✓')" style="padding:4px 10px;font-size:11px">Copy</button>
+      </div>
+      <div style="padding:0 14px 14px;font-size:13px;line-height:1.7;color:var(--text-1);white-space:pre-line">${text}</div>
+    </div>
+    <button class="btn btn-secondary btn-full" onclick="showToast('Regenerating…')">Try a different angle</button>`;
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('post-panel').classList.add('open');
+}
+
+function openDraftPanel() {
+  openPostFromCapture();
+}
+
+function closePostPanel() { closePanel(); }
+
+// ── Toast ──
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ── Keyboard dismiss ──
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+</script>
+</body>
+</html>
