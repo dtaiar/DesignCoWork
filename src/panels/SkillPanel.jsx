@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { skills } from '../data/skills'
-import { generateOutput } from '../data/outputs'
 
 function ChipGroup({ options, defaults = [], single = false, onChange }) {
   const [selected, setSelected] = useState(new Set(defaults))
@@ -93,7 +92,7 @@ export default function SkillPanel({ open, skill, onClose, onRun, prefill }) {
 
   if (!def) return null
 
-  const handleRun = () => {
+  const handleRun = async () => {
     setRunning(true)
 
     // Map form labels to output generator input shape
@@ -109,12 +108,30 @@ export default function SkillPanel({ open, skill, onClose, onRun, prefill }) {
       focusQuestion: raw['Focus question'] || '',
     }
 
-    // Simulate processing delay (replace with real API call later)
-    setTimeout(() => {
-      const output = generateOutput(def.id, input)
-      setRunning(false)
+    try {
+      const res = await fetch('/api/skill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skillId: def.id, input }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `HTTP ${res.status}`)
+      }
+      const output = await res.json()
       onRun(output)
-    }, 1200)
+    } catch (e) {
+      // Fallback: close panel and show error via parent toast if available
+      console.error('[skill] API error:', e.message)
+      onRun({
+        skill: def.name, skillColor: 'var(--text-3)', icon: def.icon,
+        title: 'Generation failed',
+        sections: [{ label: 'Error', type: 'body', text: e.message }],
+        copyText: '',
+      })
+    } finally {
+      setRunning(false)
+    }
   }
 
   return (
