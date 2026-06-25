@@ -127,7 +127,21 @@ export default function CaptureTab({ onOpenPost, onOpenCapture, showToast, captu
             style={{ cursor: 'pointer' }}
           >
             <div className="cap-header">
-              <div className="cap-type" style={{ color: c.typeColor }}>{c.type}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 2 }}>
+                <div className="cap-type" style={{ color: c.typeColor }}>{c.type}</div>
+                {c.chip && (
+                  <div style={{
+                    fontSize: 11, fontWeight: 600, padding: '1px 6px', borderRadius: 100,
+                    background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-2)',
+                  }}>{c.chip}</div>
+                )}
+                {c.chip2 && (
+                  <div style={{
+                    fontSize: 11, fontWeight: 600, padding: '1px 6px', borderRadius: 100,
+                    background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-2)',
+                  }}>{c.chip2}</div>
+                )}
+              </div>
               <div className="cap-title">{c.title}</div>
               <div className="cap-source">{c.source}</div>
             </div>

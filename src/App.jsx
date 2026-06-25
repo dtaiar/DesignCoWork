@@ -19,6 +19,7 @@ export default function App() {
   const [activePanel, setActivePanel] = useState(null)
   const [activeSkill, setActiveSkill] = useState(null)
   const [skillOutput, setSkillOutput] = useState(null)
+  const [skillPrefill, setSkillPrefill] = useState(null)
   const [postContext, setPostContext] = useState(null)
   const [captureDetail, setCaptureDetail] = useState(null)
   const [toast, setToast] = useState({ msg: '', show: false })
@@ -29,7 +30,22 @@ export default function App() {
     setTimeout(() => setToast(t => ({ ...t, show: false })), 2200)
   }, [])
 
-  const openSkillPanel = (skill) => { setActiveSkill(skill); setActivePanel('skill') }
+  const openSkillPanel = (skill) => { setSkillPrefill(null); setActiveSkill(skill); setActivePanel('skill') }
+  const openSkillWithContext = (skill, capture) => {
+    const brief = [
+      capture.title,
+      capture.source,
+      '',
+      'Key points:',
+      ...(capture.points || []).map(p => `- ${p}`),
+      '',
+      'Why it matters:',
+      capture.relevance,
+    ].join('\n')
+    setSkillPrefill(brief)
+    setActiveSkill(skill)
+    setActivePanel('skill')
+  }
   const openOutputPanel = (output) => { if (output) setSkillOutput(output); setActivePanel('output') }
   const openPostPanel = (ctx) => { setPostContext(ctx); setActivePanel('post') }
   const openCapturePanel = (capture) => { setCaptureDetail(capture); setActivePanel('capture') }
@@ -56,10 +72,10 @@ export default function App() {
       </main>
       <BottomNav active={activeTab} onSwitch={setActiveTab} />
       {activePanel && <div className="overlay" onClick={closePanel} />}
-      <SkillPanel open={activePanel === 'skill'} skill={activeSkill} onClose={closePanel} onRun={runSkill} />
+      <SkillPanel open={activePanel === 'skill'} skill={activeSkill} onClose={closePanel} onRun={runSkill} prefill={skillPrefill} />
       <OutputPanel open={activePanel === 'output'} output={skillOutput} onClose={closePanel} showToast={showToast} />
       <PostPanel open={activePanel === 'post'} context={postContext} onClose={closePanel} showToast={showToast} />
-      <CaptureDetailPanel open={activePanel === 'capture'} capture={captureDetail} onClose={closePanel} onOpenPost={openPostPanel} showToast={showToast} />
+      <CaptureDetailPanel open={activePanel === 'capture'} capture={captureDetail} onClose={closePanel} onOpenPost={openPostPanel} onUseAsContext={openSkillWithContext} showToast={showToast} />
       <Toast msg={toast.msg} show={toast.show} />
     </div>
   )

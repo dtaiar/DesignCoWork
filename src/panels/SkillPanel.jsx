@@ -31,45 +31,51 @@ function ChipGroup({ options, defaults = [], single = false, onChange }) {
   )
 }
 
-function SkillForm({ fields, formRef }) {
+function SkillForm({ fields, formRef, prefill }) {
   return (
     <>
-      {fields.map((f, i) => (
-        <div key={i} className="form-group">
-          <label className="form-label">
-            {f.label}
-            {f.optional && <span className="form-hint"> (optional)</span>}
-          </label>
-          {f.type === 'textarea' && (
-            <textarea
-              className="input"
-              rows={f.rows || 3}
-              placeholder={f.placeholder}
-              onChange={e => { if (formRef.current) formRef.current[f.label] = e.target.value }}
-            />
-          )}
-          {f.type === 'input' && (
-            <input
-              className="input"
-              placeholder={f.placeholder}
-              onChange={e => { if (formRef.current) formRef.current[f.label] = e.target.value }}
-            />
-          )}
-          {f.type === 'chips' && (
-            <ChipGroup
-              options={f.options}
-              defaults={f.defaults || []}
-              single={!!f.group}
-              onChange={vals => { if (formRef.current) formRef.current[f.label] = vals }}
-            />
-          )}
-        </div>
-      ))}
+      {fields.map((f, i) => {
+        // Pre-fill first textarea with capture context if provided
+        const defaultValue = (i === 0 && f.type === 'textarea' && prefill) ? prefill : ''
+        if (defaultValue && formRef.current) formRef.current[f.label] = defaultValue
+        return (
+          <div key={i} className="form-group">
+            <label className="form-label">
+              {f.label}
+              {f.optional && <span className="form-hint"> (optional)</span>}
+            </label>
+            {f.type === 'textarea' && (
+              <textarea
+                className="input"
+                rows={f.rows || 3}
+                placeholder={f.placeholder}
+                defaultValue={defaultValue}
+                onChange={e => { if (formRef.current) formRef.current[f.label] = e.target.value }}
+              />
+            )}
+            {f.type === 'input' && (
+              <input
+                className="input"
+                placeholder={f.placeholder}
+                onChange={e => { if (formRef.current) formRef.current[f.label] = e.target.value }}
+              />
+            )}
+            {f.type === 'chips' && (
+              <ChipGroup
+                options={f.options}
+                defaults={f.defaults || []}
+                single={!!f.group}
+                onChange={vals => { if (formRef.current) formRef.current[f.label] = vals }}
+              />
+            )}
+          </div>
+        )
+      })}
     </>
   )
 }
 
-export default function SkillPanel({ open, skill, onClose, onRun }) {
+export default function SkillPanel({ open, skill, onClose, onRun, prefill }) {
   const def = skills.find(s => s.id === skill)
   const formRef = useRef({})
   const [running, setRunning] = useState(false)
@@ -120,7 +126,7 @@ export default function SkillPanel({ open, skill, onClose, onRun }) {
         <div className="panel-sub">{def.desc}</div>
       </div>
       <div className="panel-body">
-        <SkillForm key={formKey} fields={def.fields} formRef={formRef} />
+        <SkillForm key={formKey} fields={def.fields} formRef={formRef} prefill={prefill} />
       </div>
       <div className="panel-footer">
         <button
