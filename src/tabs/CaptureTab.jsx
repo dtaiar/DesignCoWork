@@ -1,9 +1,23 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 export default function CaptureTab({ onOpenPost, onOpenCapture, showToast, captures = [], addCapture }) {
   const [inputType, setInputType] = useState('url')
   const [input, setInput] = useState('')
   const [status, setStatus] = useState('idle') // idle | fetching | enriching | error
+  const [search, setSearch] = useState('')
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return captures
+    const q = search.toLowerCase()
+    return captures.filter(c =>
+      (c.title || '').toLowerCase().includes(q) ||
+      (c.source || '').toLowerCase().includes(q) ||
+      (c.chip || '').toLowerCase().includes(q) ||
+      (c.chip2 || '').toLowerCase().includes(q) ||
+      (c.relevance || '').toLowerCase().includes(q) ||
+      (c.points || []).some(p => p.toLowerCase().includes(q))
+    )
+  }, [captures, search])
 
   const placeholders = {
     url: 'Paste a URL, LinkedIn post, or article link…',
@@ -101,10 +115,21 @@ export default function CaptureTab({ onOpenPost, onOpenCapture, showToast, captu
         </div>
       </div>
 
-      {/* List header */}
+      {/* Search + list header */}
+      <div style={{ padding: '10px 20px 0' }}>
+        <input
+          className="input"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search references…"
+          style={{ width: '100%', boxSizing: 'border-box' }}
+        />
+      </div>
       <div className="section-header">
         <span className="section-title">Saved references</span>
-        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{captures.length} captures</span>
+        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>
+          {search.trim() ? `${filtered.length} of ${captures.length}` : `${captures.length} captures`}
+        </span>
       </div>
 
       {/* Capture cards */}
@@ -119,7 +144,12 @@ export default function CaptureTab({ onOpenPost, onOpenCapture, showToast, captu
           </div>
         )}
 
-        {captures.map(c => (
+        {filtered.length === 0 && !loading && search.trim() && (
+          <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 13 }}>
+            No captures match "{search}"
+          </div>
+        )}
+        {filtered.map(c => (
           <div
             key={c.id}
             className="cap-card"

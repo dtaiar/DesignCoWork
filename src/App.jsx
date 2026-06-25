@@ -12,6 +12,7 @@ import OutputPanel from './panels/OutputPanel'
 import PostPanel from './panels/PostPanel'
 import CaptureDetailPanel from './panels/CaptureDetailPanel'
 import { useCaptures } from './hooks/useCaptures'
+import { useDrafts } from './hooks/useDrafts'
 import './App.css'
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
   const [captureDetail, setCaptureDetail] = useState(null)
   const [toast, setToast] = useState({ msg: '', show: false })
   const { captures, addCapture } = useCaptures()
+  const { drafts, addDraft, deleteDraft } = useDrafts()
 
   const showToast = useCallback((msg) => {
     setToast({ msg, show: true })
@@ -68,13 +70,15 @@ export default function App() {
           showToast={showToast}
           captures={captures}
           addCapture={addCapture}
+          drafts={drafts}
+          onDeleteDraft={deleteDraft}
         />
       </main>
       <BottomNav active={activeTab} onSwitch={setActiveTab} />
       {activePanel && <div className="overlay" onClick={closePanel} />}
       <SkillPanel open={activePanel === 'skill'} skill={activeSkill} onClose={closePanel} onRun={runSkill} prefill={skillPrefill} />
       <OutputPanel open={activePanel === 'output'} output={skillOutput} onClose={closePanel} showToast={showToast} />
-      <PostPanel open={activePanel === 'post'} context={postContext} onClose={closePanel} showToast={showToast} />
+      <PostPanel open={activePanel === 'post'} context={postContext} onClose={closePanel} showToast={showToast} onSaveDraft={addDraft} />
       <CaptureDetailPanel open={activePanel === 'capture'} capture={captureDetail} onClose={closePanel} onOpenPost={openPostPanel} onUseAsContext={openSkillWithContext} showToast={showToast} />
       <Toast msg={toast.msg} show={toast.show} />
     </div>

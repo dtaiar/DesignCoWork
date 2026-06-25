@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { sampleCaptures, topics, postAngles } from '../data/captures'
+import { topics } from '../data/captures'
 
-export default function PostsTab({ onOpenPost }) {
+export default function PostsTab({ onOpenPost, captures = [], drafts = [], onDeleteDraft, showToast }) {
   const [mode, setMode] = useState('ref')
 
   return (
@@ -27,18 +27,27 @@ export default function PostsTab({ onOpenPost }) {
         <>
           <div className="section-header">
             <span className="section-title">Pick a capture to write about</span>
+            <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{captures.length} saved</span>
           </div>
-          <div className="item-list">
-            {sampleCaptures.map(c => (
-              <div key={c.id} className="item-card" onClick={() => onOpenPost({ type: 'capture', capture: c })}>
-                <div className="item-top">
-                  <span className="item-title">{c.title}</span>
-                  <span className={`chip ${c.chip.cls}`}>{c.chip.label}</span>
+          {captures.length === 0 ? (
+            <div style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text-3)' }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>📎</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-2)', marginBottom: 6 }}>No captures yet</div>
+              <div style={{ fontSize: 13, lineHeight: 1.5 }}>Paste a URL in the Capture tab to save a reference and write a post from it.</div>
+            </div>
+          ) : (
+            <div className="item-list">
+              {captures.map(c => (
+                <div key={c.id} className="item-card" onClick={() => onOpenPost({ type: 'capture', capture: c })}>
+                  <div className="item-top">
+                    <span className="item-title">{c.title}</span>
+                    {c.chip && <span className="chip chip-accent">{c.chip}</span>}
+                  </div>
+                  <div className="item-preview">{(c.points || [])[0]}</div>
                 </div>
-                <div className="item-preview">{c.points[0]}</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </>
       )}
 
@@ -67,24 +76,47 @@ export default function PostsTab({ onOpenPost }) {
         </>
       )}
 
+      {/* Draft queue */}
       <div className="section-header" style={{ marginTop: 12 }}>
         <span className="section-title">Draft queue</span>
-        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>1 draft</span>
+        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{drafts.length} {drafts.length === 1 ? 'draft' : 'drafts'}</span>
       </div>
-      <div className="item-list">
-        <div className="item-card" onClick={() => onOpenPost({ type: 'draft' })}>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-2)', marginBottom: 8 }}>
-            Draft · From reference
-          </div>
-          <div style={{ fontSize: 14, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line' }}>
-            {postAngles[0].text}
-          </div>
-          <div className="item-footer" style={{ justifyContent: 'space-between' }}>
-            <span className="chip chip-neutral">Design Tokens</span>
-            <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); navigator.clipboard?.writeText(postAngles[0].text) }}>Copy</button>
-          </div>
+      {drafts.length === 0 ? (
+        <div style={{ padding: '16px 20px', color: 'var(--text-3)', fontSize: 13 }}>
+          No drafts saved yet. Generate a post and hit "Save draft".
         </div>
-      </div>
+      ) : (
+        <div className="item-list">
+          {drafts.map(d => (
+            <div key={d.id} className="item-card">
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-2)', marginBottom: 8 }}>
+                {d.source || 'Draft'}
+              </div>
+              <div style={{
+                fontSize: 14, lineHeight: 1.6, color: 'var(--text-1)',
+                display: '-webkit-box', WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-line',
+              }}>
+                {d.text}
+              </div>
+              <div className="item-footer" style={{ justifyContent: 'flex-end', gap: 8 }}>
+                <button
+                  className="btn btn-sm btn-secondary"
+                  onClick={e => { e.stopPropagation(); onDeleteDraft?.(d.id); showToast?.('Draft deleted') }}
+                >Delete</button>
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={e => {
+                    e.stopPropagation()
+                    navigator.clipboard?.writeText(d.text)
+                    showToast?.('Copied to clipboard ✓')
+                  }}
+                >Copy</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="spacer" />
     </>
   )

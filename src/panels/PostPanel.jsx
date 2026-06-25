@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-export default function PostPanel({ open, context, onClose, showToast }) {
+export default function PostPanel({ open, context, onClose, showToast, onSaveDraft }) {
   const [angles, setAngles] = useState([])
   const [selected, setSelected] = useState(0)
   const [draft, setDraft] = useState('')
@@ -145,7 +145,16 @@ export default function PostPanel({ open, context, onClose, showToast }) {
           onClick={copy}
           disabled={!draft || loading}
         >Copy post</button>
-        <button className="btn btn-secondary btn-full" onClick={onClose}>Close</button>
+        <button
+          className="btn btn-secondary btn-full"
+          disabled={!draft || loading}
+          onClick={() => {
+            const source = isTopic ? `Topic · ${context?.topic}` : `From capture · ${context?.capture?.title?.slice(0, 40)}`
+            onSaveDraft?.(draft, source)
+            showToast?.('Draft saved ✓')
+            onClose()
+          }}
+        >Save draft</button>
       </div>
     </div>
   )
