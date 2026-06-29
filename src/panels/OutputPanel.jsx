@@ -1,5 +1,13 @@
-// Renders the dynamic output object produced by generateOutput(skillId, input).
-// Section types: 'bullets' | 'body' | 'callout' | 'issues' | 'tokens' | 'copy-variants'
+import { useState } from 'react'
+
+// Skills a brief output can be piped into as prefill context
+const CONTEXT_SKILLS = [
+  { id: 'critique', icon: '🔍', label: 'Design Critique' },
+  { id: 'a11y',    icon: '♿', label: 'Accessibility' },
+  { id: 'handoff', icon: '📐', label: 'Dev Handoff' },
+  { id: 'system',  icon: '🧩', label: 'System Audit' },
+  { id: 'uxcopy',  icon: '✍️', label: 'UX Copy' },
+]
 
 function Section({ section }) {
   if (section.type === 'bullets') {
@@ -97,7 +105,30 @@ function Section({ section }) {
   return null
 }
 
-export default function OutputPanel({ open, output, onClose, showToast }) {
+export default function OutputPanel({ open, output, onClose, showToast, onSaveOutput, onOpenSkillWithPrefill }) {
+  const [saved, setSaved] = useState(false)
+  const [showSkillPicker, setShowSkillPicker] = useState(false)
+
+  const isBrief = output?.skill === 'PM Brief Intake'
+
+  const handleSave = () => {
+    onSaveOutput?.(output)
+    setSaved(true)
+    showToast('Saved to library ✓')
+  }
+
+  const handleClose = () => {
+    setSaved(false)
+    setShowSkillPicker(false)
+    onClose()
+  }
+
+  const useInSkill = (skillId) => {
+    setShowSkillPicker(false)
+    onClose()
+    setTimeout(() => onOpenSkillWithPrefill?.(skillId, output?.copyText || ''), 220)
+  }
+
   return (
     <div className={`panel${open ? ' open' : ''}`}>
       <div className="panel-handle" />
@@ -112,15 +143,59 @@ export default function OutputPanel({ open, output, onClose, showToast }) {
             {output.sections.map((section, i) => (
               <Section key={i} section={section} />
             ))}
+
+            {/* Brief → skill context propagation */}
+            {isBrief && showSkillPicker && (
+              <div style={{
+                border: '1.5px solid var(--border)', borderRadius: 12,
+                padding: '14px 16px', background: 'var(--surface-2)', marginTop: 8,
+              }}>
+                <div style={{
+                  fontSize: 10, fontWeight: 700, color: 'var(--text-3)',
+                  textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 10,
+                }}>Use brief as context in…</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {CONTEXT_SKILLS.map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => useInSkill(s.id)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 12px', borderRadius: 10,
+                        border: '1.5px solid var(--border)', background: 'var(--surface)',
+                        cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                      }}
+                    >
+                      <span style={{ fontSize: 18 }}>{s.icon}</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-1)' }}>{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
           <div className="panel-footer">
+            {isBrief ? (
+              <button
+                className="btn btn-secondary btn-full"
+                onClick={() => setShowSkillPicker(v => !v)}
+              >{showSkillPicker ? 'Cancel' : 'Use in skill →'}</button>
+            ) : (
+              <button
+                className="btn btn-secondary btn-full"
+                onClick={handleSave}
+                disabled={saved}
+                style={{ opacity: saved ? 0.6 : 1 }}
+              >{saved ? 'Saved ✓' : 'Save to library'}</button>
+            )}
             <button
               className="btn btn-primary btn-full"
-              onClick={() => { navigator.clipboard?.writeText(output.copyText || ''); showToast('Copied ✓'); onClose() }}
+              onClick={() => { navigator.clipboard?.writeText(output.copyText || ''); showToast('Copied ✓'); handleClose() }}
             >
               Copy output
             </button>
-            <button className="btn btn-secondary btn-full" onClick={onClose}>Close</button>
+            <button className="btn btn-secondary btn-full" onClick={handleClose}>Close</button>
           </div>
         </>
       ) : (
