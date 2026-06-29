@@ -49,6 +49,7 @@ export default function CaptureDetailPanel({ open, capture: c, onClose, onOpenPo
           zIndex: 200,
           transform: open ? 'translateY(0)' : 'translateY(100%)',
           transition: 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)',
+          pointerEvents: open ? 'auto' : 'none',
           maxHeight: '90dvh', display: 'flex', flexDirection: 'column',
         }}
       >
