@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b0b0d;
+  --surface: #131316;
+  --surface-raised: #1a1a1f;
+  --border: #26262c;
+  --border-strong: #34343c;
+  --foreground: #f2f2f5;
+  --muted: #9a9aa3;
+  --muted-foreground: #6f6f78;
+  --accent: #8b7cff;
+  --accent-foreground: #0b0b0d;
+  --accent-soft: #1d1a33;
+  --danger: #ff6b6b;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --radius-md: var(--radius);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+* { border-color: var(--border); }
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.scrollbar-thin::-webkit-scrollbar { width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
