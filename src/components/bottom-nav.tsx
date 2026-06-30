@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Plus } from "lucide-react";
 import { navItems, type NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
@@ -13,22 +12,13 @@ function isActive(pathname: string, href: string) {
 
 export function BottomNav() {
   const pathname = usePathname();
-  const mid = Math.ceil(navItems.length / 2);
-  const left = navItems.slice(0, mid);
-  const right = navItems.slice(mid);
 
   return (
-    <nav className="flex-shrink-0 overflow-visible border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]">
-      <div className="mx-auto flex max-w-3xl items-center overflow-visible px-2">
-        <div className="flex flex-1 items-center justify-evenly">
-          {left.map((item) => <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} />)}
-        </div>
-        <Link href="/topics/new" aria-label="New topic" className="-mt-5 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-105">
-          <Plus size={20} />
-        </Link>
-        <div className="flex flex-1 items-center justify-evenly">
-          {right.map((item) => <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} />)}
-        </div>
+    <nav className="flex-shrink-0 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto flex max-w-3xl items-center justify-evenly px-2">
+        {navItems.map((item) => (
+          <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} />
+        ))}
       </div>
     </nav>
   );
