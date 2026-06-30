@@ -280,8 +280,9 @@ textarea.input { resize: none; line-height: 1.6; }
   border-radius: 24px 24px 0 0; z-index: 201; max-height: 92vh; overflow-y: auto;
   transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
   padding-bottom: env(safe-area-inset-bottom, 20px);
+  pointer-events: none;
 }
-.panel.open { transform: translateX(-50%) translateY(0); }
+.panel.open { transform: translateX(-50%) translateY(0); pointer-events: auto; }
 .panel-handle { width: 36px; height: 4px; background: var(--border); border-radius: 100px; margin: 12px auto 0; }
 .panel-head { padding: 16px 20px 14px; border-bottom: 1px solid var(--border); }
 .panel-skill-icon { font-size: 28px; margin-bottom: 6px; }
