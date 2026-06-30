@@ -1,6 +1,5 @@
 {
-  "buildCommand": "echo 'static'",
-  "outputDirectory": "public",
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+  "framework": "nextjs",
+  "buildCommand": "cd design-cowork-app && npm install && npm run build",
+  "outputDirectory": "design-cowork-app/.next"
 }
-
